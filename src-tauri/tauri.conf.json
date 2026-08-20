@@ -1,0 +1,55 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "1boost",
+  "version": "1.1.20",
+  "identifier": "com.emireln.oneboost",
+  "build": {
+    "beforeDevCommand": "npm run dev",
+    "devUrl": "http://localhost:1420",
+    "beforeBuildCommand": "npm run build",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "label": "main",
+        "title": "1boost",
+        "width": 960,
+        "height": 640,
+        "minWidth": 840,
+        "minHeight": 580,
+        "center": true,
+        "decorations": false,
+        "resizable": true
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/32x32.png",
+      "icons/128x128.png",
+      "icons/128x128@2x.png",
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "windows": {
+      "nsis": {
+        "installerIcon": "icons/icon.ico",
+        "displayLanguageSelector": false
+      }
+    }
+  },
+  "plugins": {
+    "updater": {
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDlGRkJENDFDRTQwNjk4RkIKUldSZkJBVFhJSnJvbndRMnoxWlJ3MWNzL3d2cEszVTdZckF3b2Y3SjQycmlXN25XOUcxQ2F5RjQK",
+      "endpoints": [
+        "https://github.com/emireln/1boost/releases/latest/download/latest.json"
+      ]
+    }
+  }
+}
