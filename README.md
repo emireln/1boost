@@ -1,79 +1,49 @@
 <p align="center">
-  <img src="public/app-icon.svg" width="120" height="120" alt="1boost Logo Icon" />
-  <br />
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 550 160" width="380" height="110">
-    <text x="50%" y="52%" font-family="system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif" font-size="160" font-weight="900" text-anchor="middle" dominant-baseline="central" letter-spacing="-5">
-      <tspan fill="#EB5D3D">1</tspan><tspan fill="#E3E3E3">boost</tspan>
-    </text>
-  </svg>
-  <br />
-  <b>Ultra-Minimalist One-Click Windows PC Optimizer & Gaming Debloater</b>
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Tauri-2.0-blue?logo=tauri" alt="Tauri 2.0" />
-  <img src="https://img.shields.io/badge/Rust-orange?logo=rust" alt="Rust" />
-  <img src="https://img.shields.io/badge/React-19-blue?logo=react" alt="React" />
-  <img src="https://img.shields.io/badge/TypeScript-blue?logo=typescript" alt="TypeScript" />
-  <img src="https://img.shields.io/badge/Style-Material_Design_3-red" alt="MD3 Dark Mode" />
-  <img src="https://img.shields.io/badge/Offline-100%25%20Local-success" alt="100% Local" />
-  <img src="https://img.shields.io/badge/i18n-EN%20%2F%20PT--BR-lightgrey" alt="EN / PT-BR" />
+  <img src="public/app-icon.svg" width="100" height="100" alt="1boost Logo" />
+  <h1>1boost</h1>
+  <p>A fast, local Windows optimizer and gaming debloater.</p>
+  <p>
+    <img src="https://img.shields.io/badge/Tauri-2.0-blue?logo=tauri" alt="Tauri" />
+    <img src="https://img.shields.io/badge/Rust-orange?logo=rust" alt="Rust" />
+    <img src="https://img.shields.io/badge/React-19-blue?logo=react" alt="React" />
+    <img src="https://img.shields.io/badge/TypeScript-blue?logo=typescript" alt="TypeScript" />
+    <img src="https://img.shields.io/badge/Offline-100%25-success" alt="Offline" />
+    <img src="https://img.shields.io/badge/Language-EN%20%7C%20PT--BR-lightgrey" alt="Languages" />
+  </p>
 </p>
 
 ---
 
-## ⚡ Overview
+**1boost** applies system tweaks, debloats background Windows services, and tunes latency for gaming. It runs completely offline, uses native PowerShell and Registry commands, and creates a restore point before touching anything.
 
-**1boost** is a high-performance, 100% local Windows PC optimization desktop application built with **Tauri 2**, **Rust**, and **React/TypeScript**, strictly adhering to **Google Material Design 3 (MD3)** dark mode guidelines.
+### What it does
 
-It delivers a fully automated, **one-click optimization sequence** executing native PowerShell scripts and Registry modifications to strip telemetry, eliminate mouse input lag, optimize network latency, and unlock peak gaming performance — with **zero network dependencies, zero telemetry tracking, and complete offline privacy**.
+- **Gaming & Input:** Enables raw 1:1 mouse input, activates HAGS, prioritizes game threads (MMCSS), disables CPU core parking, and sets the Ultimate Performance power plan.
+- **Network Tuning:** Disables Nagle’s Algorithm (`TcpAckFrequency` / `TCPNoDelay`) and turns off Energy-Efficient Ethernet spikes.
+- **Privacy & Debloat:** Disables telemetry services (DiagTrack, error reporting, tracking tasks), strips Cortana, Bing Start search, Widgets, and cleans temporary files.
+- **Safe by Default:** Automatically runs `Checkpoint-Computer` to create a restore point, snapshots registry changes to `%APPDATA%\1boost\backups`, and supports one-click rollback. Advanced tweaks stay off until toggled.
 
----
+### Extra Tools
 
-## ✨ Feature Highlights
-
-### 🚀 One-Click Boost (52 Tweaks)
-- **Raw 1:1 Mouse Input** — disables Enhanced Pointer Precision + hover lag (`MouseSpeed`, `MouseHoverTime`).
-- **Hardware-Accelerated GPU Scheduling (HAGS)** — `HwSchMode = 2` for stable 1% low FPS.
-- **MMCSS Gaming Priority** — `SystemResponsiveness = 0`, GPU Priority 8 for max game thread scheduling.
-- **Nagle's Algorithm Disabled** — `TcpAckFrequency = 1` + `TCPNoDelay = 1` for zero-latency TCP.
-- **Energy-Efficient Ethernet (EEE) Disabled** — eliminates Green Ethernet ping spikes.
-- **USB Selective Suspend Disabled** — prevents input lag spikes and disconnects.
-- **Ultimate Performance Power Plan** + **CPU Core Parking Disabled** + **Power Throttling Off**.
-- **Large System Cache** — gives kernel file cache more RAM for faster disk access.
-- **Full Telemetry Stripping** — DiagTrack, dmwappushservice, Location Tracking, Advertising ID, Error Reporting (WER), Activity History, Consumer Features, telemetry tasks, feedback prompts.
-- **Security Hardening** — WPBT boot-table execution blocked, device companion app installs prevented.
-- **Debloat** — Cortana & Voice Activation, Bing Start Search, Widgets feed, Windows Tips, Store recommendations, End Task on taskbar, background apps, hibernation cleanup, temp/cache clean.
-- **System Restore Point Safeguard** — `Checkpoint-Computer` automatically executed before optimizations.
-- **🔄 Reversible Tweak Engine** — snapshots registry entries before applying (`%APPDATA%\1boost\backups`); undo any tweak or revert everything in one click.
-- **⚙️ Tweak Tiers** — `safe` tweaks included in one-click boost; `advanced` tweaks default OFF with an explicit confirmation dialog.
-
-### 🧰 System Utilities Hub
-- **DNS Switcher** — 9 presets (Google, Cloudflare, OpenDNS, Quad9, AdGuard, DNS.SB, ControlD, CleanBrowsing, DHCP reset) with live active-preset detection.
-- **Windows Update Modes** — Default, Security Only (delayed feature updates), or Disable (with explicit risk confirmation).
-- **System Fixes** — Network stack reset, Windows Update reset, SFC + DISM corruption scan, NTP pool sync, Explorer restart.
-- **Windows Features** — Toggle .NET, WSL, Hyper-V, Legacy Media, Windows Sandbox, NFS, and Scheduled Registry Backup.
-- **WinGet Software Manager** — 48 curated developer & gaming packages with instant search and one-click upgrade all.
-
-### 🖥️ Real-Time Execution Console
-- Streaming PowerShell logs with timestamps, execution levels (info, success, warning, error), and clear controls.
-
-### 🔒 Security & Settings
-- **Password App Lock** with cryptographic PBKDF2 hash verification.
-- **System Tray Minimization** and **Parallax Stars visual effects**.
-- **Full Bilingual Support**: English (EN) and Portuguese (PT-BR).
+- **DNS Switcher:** Quick presets for Cloudflare, Google, Quad9, AdGuard, and others.
+- **Update Control:** Toggle between standard updates, security-only, or disabled.
+- **System Maintenance:** Quick actions for SFC/DISM scans, network stack resets, and Explorer restarts.
+- **Package Manager:** Browse and batch-install common apps and runtimes via WinGet.
+- **Live Logs:** Real-time terminal output showing every script and command being executed.
 
 ---
 
-## 🛠️ Verification & Build Commands
+### Development
+
+**Prerequisites:** Node.js, Rust, and Tauri prerequisites for Windows.
 
 ```bash
-# Frontend Build (Vite + TypeScript)
+# Install frontend dependencies
+npm install
+
+# Run in development mode
+npm run tauri dev
+
+# Build for production
 npm run build
-
-# Rust Backend Type Check
-cd src-tauri && cargo check
-
-# Rust Unit & Safety Tests
-cd src-tauri && cargo test
-```
+cd src-tauri && cargo build --release
