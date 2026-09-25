@@ -137,7 +137,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
         </div>
 
         {/* Admin Badge */}
-        <Tooltip content={isAdmin ? `Elevated Rights Active (${osInfo})` : "Standard User Mode"}>
+        <Tooltip content={isAdmin ? `${t("admin_active_tooltip")} (${osInfo})` : t("admin_user_tooltip")}>
           <span
             style={{
               fontSize: "10px",
@@ -212,7 +212,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
           </button>
         </Tooltip>
 
-        <Tooltip content={isMaximized ? "Restore" : t("maximize")}>
+        <Tooltip content={isMaximized ? t("restore") : t("maximize")}>
           <button
             className="icon-btn-containerless"
             onClick={handleToggleMaximize}

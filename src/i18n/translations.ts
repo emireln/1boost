@@ -5,14 +5,14 @@ export interface Translations {
   nav_boost: string;
   nav_tweaks: string;
   nav_logs: string;
-  nav_cloud: string;
-  nav_social: string;
-  nav_discover: string;
   nav_settings: string;
   admin_active: string;
   admin_user: string;
+  admin_active_tooltip: string;
+  admin_user_tooltip: string;
   minimize: string;
   maximize: string;
+  restore: string;
   close: string;
 
   // Main Dashboard
@@ -31,15 +31,12 @@ export interface Translations {
   cat_power: string;
   cat_debloat: string;
   cat_cleanup: string;
-  save_profile_cloud: string;
 
   // Settings View Sections & Controls
   settings_title: string;
   settings_subtitle: string;
   app_language: string;
   app_language_desc: string;
-  show_profile_island: string;
-  show_profile_island_desc: string;
   app_lock: string;
   app_lock_desc: string;
   btn_set_lock_password: string;
@@ -48,6 +45,8 @@ export interface Translations {
   app_lock_incorrect: string;
   app_lock_unlock: string;
   app_lock_verifying: string;
+  enter_password_prompt: string;
+  password_set_success: string;
   check_for_updates: string;
   check_for_updates_desc: string;
   btn_check_updates: string;
@@ -69,41 +68,7 @@ export interface Translations {
   filter_info: string;
   filter_success: string;
   filter_error: string;
-
-  // Auth & Profile
-  sign_in: string;
-  sign_up: string;
-  account_created: string;
-  username_email: string;
-  gaming_username: string;
-  email_address: string;
-  password: string;
-  confirm_password: string;
-  passwords_mismatch: string;
-  create_account: string;
-  generate_nick: string;
-  change_avatar: string;
-  upload_image: string;
-  change_password: string;
-  current_password: string;
-  new_password: string;
-  update_username: string;
-
-  // Social & Cloud
-  cloud_profiles_title: string;
-  cloud_profiles_subtitle: string;
-  shared_with_me: string;
-  my_cloud_configs: string;
-  friends_squad: string;
-  apply_profile: string;
-  sync_and_apply: string;
-  share: string;
-  delete: string;
-  save_profile: string;
-  profile_title_prompt: string;
-  enter_username: string;
-  send_request: string;
-  accept: string;
+  console_empty_logs: string;
 
   // Dynamic Tweak Name & Description Translations
   tweak_mouse_accel_name: string;
@@ -299,28 +264,23 @@ export interface Translations {
   apps_curated: string;
   apps_install: string;
 
-  // Presets Marketplace & Sync
-  presets_tab_title: string;
-  presets_tab_subtitle: string;
-  presets_publish: string;
-  presets_publish_desc: string;
-  presets_publish_btn: string;
-  presets_publishing: string;
-  preset_name_ph: string;
-  preset_desc_ph: string;
-  preset_tags_ph: string;
-  preset_contains_advanced: string;
-  preset_safe_only: string;
-  preset_safe_badge: string;
-  preset_remix: string;
-  preset_remix_of: string;
-  preset_apply: string;
-  presets_tweak_count: string;
-  presets_empty: string;
-  presets_empty_hint: string;
-  presets_loading: string;
-  presence_online: string;
-  presence_offline: string;
+  // Tweak Revert & Profile
+  tweaks_reverted_toast: string;
+  no_revertible_tweaks: string;
+  invalid_json_profile: string;
+
+  // Auto-Updater Modal
+  updater_title: string;
+  updater_checking: string;
+  updater_new_release: string;
+  updater_whats_new: string;
+  updater_downloading: string;
+  updater_installing: string;
+  updater_relaunch_btn: string;
+  updater_latest: string;
+  updater_up_to_date: string;
+  updater_check_again: string;
+  updater_retry: string;
 }
 
 export const translations: Record<Language, Translations> = {
@@ -328,14 +288,14 @@ export const translations: Record<Language, Translations> = {
     nav_boost: "One-Click Boost",
     nav_tweaks: "Tweak Customization",
     nav_logs: "Execution Console Logs",
-    nav_cloud: "Cloud Profiles & Sync",
-    nav_social: "Social & Friends",
-    nav_discover: "Discover Hub",
     nav_settings: "Settings & Security",
     admin_active: "ADMIN",
     admin_user: "USER",
+    admin_active_tooltip: "Elevated Rights Active",
+    admin_user_tooltip: "Standard User Mode",
     minimize: "Minimize",
     maximize: "Maximize",
+    restore: "Restore",
     close: "Close",
 
     boost_now: "BOOST",
@@ -352,15 +312,12 @@ export const translations: Record<Language, Translations> = {
     cat_power: "POWER",
     cat_debloat: "DEBLOAT",
     cat_cleanup: "CLEANUP",
-    save_profile_cloud: "Save Profile to Cloud",
 
     settings_title: "1boost Preferences & Security",
     settings_subtitle: "Configure app password lock, language, visual effects, system tray, and updates.",
 
     app_language: "Application Language",
     app_language_desc: "Choose between English and natural Brazilian Portuguese (PT-BR).",
-    show_profile_island: "Show Profile Island on Main Page",
-    show_profile_island_desc: "Display user avatar and handle shortcut pill at the bottom of the main dashboard.",
     app_lock: "Lock App with Password",
     app_lock_desc: "Require an encrypted security password to launch and access 1boost.",
     btn_set_lock_password: "Set Security Password",
@@ -369,6 +326,8 @@ export const translations: Record<Language, Translations> = {
     app_lock_incorrect: "Incorrect password. Please try again.",
     app_lock_unlock: "UNLOCK 1BOOST",
     app_lock_verifying: "Verifying...",
+    enter_password_prompt: "Enter a security password for 1boost:",
+    password_set_success: "Security password set & app lock enabled!",
     check_for_updates: "Automatic GitHub Updates",
     check_for_updates_desc: "Check for new releases directly from GitHub.",
     btn_check_updates: "Check for Updates",
@@ -389,39 +348,7 @@ export const translations: Record<Language, Translations> = {
     filter_info: "Info",
     filter_success: "Success",
     filter_error: "Errors",
-
-    sign_in: "SIGN IN",
-    sign_up: "SIGN UP",
-    account_created: "Account created! Check your email to confirm registration.",
-    username_email: "Username or Email",
-    gaming_username: "Gaming Username",
-    email_address: "Email Address",
-    password: "Password",
-    confirm_password: "Confirm Password",
-    passwords_mismatch: "Passwords do not match",
-    create_account: "CREATE ACCOUNT",
-    generate_nick: "Generate Random Gaming Username",
-    change_avatar: "Profile Avatar & Picture",
-    upload_image: "Upload Image",
-    change_password: "Change Password (Security Re-Authentication)",
-    current_password: "Current Password (Verification)",
-    new_password: "New Password",
-    update_username: "Update Username",
-
-    cloud_profiles_title: "Cloud Optimization Profiles",
-    cloud_profiles_subtitle: "Save your current tweak combination to the cloud or apply a saved configuration profile with one click.",
-    shared_with_me: "Shared With Me",
-    my_cloud_configs: "My Cloud Configs",
-    friends_squad: "Friends",
-    apply_profile: "APPLY PROFILE",
-    sync_and_apply: "Sync & Apply",
-    share: "Share",
-    delete: "Delete",
-    save_profile: "Save Profile",
-    profile_title_prompt: "Enter a title for this optimization profile:",
-    enter_username: "Enter exact username...",
-    send_request: "Send Request",
-    accept: "Accept",
+    console_empty_logs: '[1boost Console Ready] No execution logs recorded. Click "BOOST" on the main dashboard to run optimizations.',
 
     tweak_mouse_accel_name: "Disable Mouse Acceleration (1:1 Raw Tracking)",
     tweak_mouse_accel_desc: "Disables Enhanced Pointer Precision for exact 1:1 pixel mouse input precision in competitive games.",
@@ -612,40 +539,34 @@ export const translations: Record<Language, Translations> = {
     apps_curated: "Curated Installer",
     apps_install: "Install",
 
-    presets_tab_title: "Community Presets",
-    presets_tab_subtitle: "Named tweak bundles shared by the community - apply a full setup in one click.",
-    presets_publish: "Publish Preset",
-    presets_publish_desc: "Publishing creates a preset from your currently enabled tweaks:",
-    presets_publish_btn: "Publish",
-    presets_publishing: "Publishing...",
-    preset_name_ph: "Preset name...",
-    preset_desc_ph: "Describe what this preset is for...",
-    preset_tags_ph: "Tags (comma separated)",
-    preset_contains_advanced: "This preset contains ADVANCED tweaks",
-    preset_safe_only: "All tweaks are SAFE",
-    preset_safe_badge: "SAFE",
-    preset_remix: "Remix",
-    preset_remix_of: "Remix of",
-    preset_apply: "Apply Preset",
-    presets_tweak_count: "tweaks",
-    presets_empty: "No community presets yet",
-    presets_empty_hint: "Publish your current tweak selection above to be the first!",
-    presets_loading: "Loading community presets...",
-    presence_online: "Online",
-    presence_offline: "Offline",
+    tweaks_reverted_toast: "tweak(s) reverted to original Windows state.",
+    no_revertible_tweaks: "No revertible tweaks found.",
+    invalid_json_profile: "Invalid JSON profile file",
+
+    updater_title: "1boost Auto-Updater",
+    updater_checking: "Checking GitHub Releases...",
+    updater_new_release: "New Release Available",
+    updater_whats_new: "What's New in",
+    updater_downloading: "Downloading Update...",
+    updater_installing: "Installing...",
+    updater_relaunch_btn: "Relaunch & Apply Update",
+    updater_latest: "You are using the latest version!",
+    updater_up_to_date: "is up to date.",
+    updater_check_again: "Check Again",
+    updater_retry: "Retry Check",
   },
   "pt-BR": {
     nav_boost: "Impulso Rápido",
     nav_tweaks: "Customização de Otimizações",
     nav_logs: "Console de Execução",
-    nav_cloud: "Perfis na Nuvem & Sync",
-    nav_social: "Comunidade & Amigos",
-    nav_discover: "Hub Discover",
     nav_settings: "Configurações & Segurança",
     admin_active: "ADMIN",
     admin_user: "USUÁRIO",
+    admin_active_tooltip: "Modo Administrador Ativo",
+    admin_user_tooltip: "Modo Usuário Padrão",
     minimize: "Minimizar",
     maximize: "Maximizar",
+    restore: "Restaurar",
     close: "Fechar",
 
     boost_now: "OTIMIZAR",
@@ -662,15 +583,12 @@ export const translations: Record<Language, Translations> = {
     cat_power: "ENERGIA",
     cat_debloat: "DEBLOAT",
     cat_cleanup: "LIMPEZA",
-    save_profile_cloud: "Salvar Perfil na Nuvem",
 
     settings_title: "Preferências e Segurança do 1boost",
     settings_subtitle: "Configure bloqueio por senha, idioma, efeitos visuais, bandeja do sistema e atualizações.",
 
     app_language: "Idioma do Aplicativo",
     app_language_desc: "Escolha entre Inglês e Português do Brasil natural (PT-BR).",
-    show_profile_island: "Exibir Card de Perfil na Página Inicial",
-    show_profile_island_desc: "Mostrar o atalho rápido de perfil com foto e nick no rodapé da tela inicial de impulso.",
     app_lock: "Bloquear Aplicativo com Senha",
     app_lock_desc: "Exigir uma senha de segurança criptografada para iniciar e acessar o 1boost.",
     btn_set_lock_password: "Definir Senha de Segurança",
@@ -679,6 +597,8 @@ export const translations: Record<Language, Translations> = {
     app_lock_incorrect: "Senha incorreta. Tente novamente.",
     app_lock_unlock: "DESBLOQUEAR 1BOOST",
     app_lock_verifying: "Verificando...",
+    enter_password_prompt: "Digite uma senha de segurança para o 1boost:",
+    password_set_success: "Senha de segurança definida e bloqueio ativado!",
     check_for_updates: "Atualizações Automáticas do GitHub",
     check_for_updates_desc: "Verifique novos lançamentos diretamente do GitHub Releases.",
     btn_check_updates: "Verificar Atualizações",
@@ -699,39 +619,7 @@ export const translations: Record<Language, Translations> = {
     filter_info: "Informativo",
     filter_success: "Sucesso",
     filter_error: "Erros",
-
-    sign_in: "ENTRAR",
-    sign_up: "CADASTRAR",
-    account_created: "Conta criada! Verifique seu e-mail para confirmar o cadastro.",
-    username_email: "Nome de Usuário ou E-mail",
-    gaming_username: "Nome de Usuário Gamer",
-    email_address: "Endereço de E-mail",
-    password: "Senha",
-    confirm_password: "Confirmar Senha",
-    passwords_mismatch: "As senhas não coincidem",
-    create_account: "CRIAR CONTA",
-    generate_nick: "Gerar Nick Aleatório de Jogo",
-    change_avatar: "Foto de Perfil e Avatar",
-    upload_image: "Enviar Imagem",
-    change_password: "Alterar Senha (Reautenticação de Segurança)",
-    current_password: "Senha Atual (Verificação)",
-    new_password: "Nova Senha",
-    update_username: "Atualizar Nick",
-
-    cloud_profiles_title: "Perfis de Otimização na Nuvem",
-    cloud_profiles_subtitle: "Salve sua combinação de otimizações na nuvem ou aplique um perfil configurado com 1 clique.",
-    shared_with_me: "Compartilhados Comigo",
-    my_cloud_configs: "Meus Perfis na Nuvem",
-    friends_squad: "Amigos",
-    apply_profile: "APLICAR PERFIL",
-    sync_and_apply: "Sincronizar e Aplicar",
-    share: "Compartilhar",
-    delete: "Excluir",
-    save_profile: "Salvar Perfil",
-    profile_title_prompt: "Digite um título para este perfil de otimização:",
-    enter_username: "Digite o nick exato...",
-    send_request: "Enviar Pedido",
-    accept: "Aceitar",
+    console_empty_logs: '[Console do 1boost Pronto] Nenhum log gravado. Clique em "OTIMIZAR" na tela inicial para iniciar.',
 
     tweak_mouse_accel_name: "Desativar Aceleração do Mouse (Entrada Bruta 1:1)",
     tweak_mouse_accel_desc: "Desativa o Aprimorar Precisão do Ponteiro para garantir rastreamento 1:1 exato em jogos competitivos.",
@@ -922,26 +810,20 @@ export const translations: Record<Language, Translations> = {
     apps_curated: "Instalador Curado",
     apps_install: "Instalar",
 
-    presets_tab_title: "Presets da Comunidade",
-    presets_tab_subtitle: "Conjuntos de otimizações nomeados compartilhados pela comunidade - aplique uma configuração completa com 1 clique.",
-    presets_publish: "Publicar Preset",
-    presets_publish_desc: "Publicar cria um preset com as otimizações atualmente ativadas:",
-    presets_publish_btn: "Publicar",
-    presets_publishing: "Publicando...",
-    preset_name_ph: "Nome do preset...",
-    preset_desc_ph: "Descreva para que serve este preset...",
-    preset_tags_ph: "Tags (separadas por vírgula)",
-    preset_contains_advanced: "Este preset contém otimizações AVANÇADAS",
-    preset_safe_only: "Todas as otimizações são SEGURAS",
-    preset_safe_badge: "SEGURO",
-    preset_remix: "Remix",
-    preset_remix_of: "Remix de",
-    preset_apply: "Aplicar Preset",
-    presets_tweak_count: "otimizações",
-    presets_empty: "Nenhum preset da comunidade ainda",
-    presets_empty_hint: "Publique sua seleção atual de otimizações acima para ser o primeiro!",
-    presets_loading: "Carregando presets da comunidade...",
-    presence_online: "Online",
-    presence_offline: "Offline",
+    tweaks_reverted_toast: "otimização(ões) restaurada(s) ao padrão do Windows.",
+    no_revertible_tweaks: "Nenhuma otimização reversível encontrada.",
+    invalid_json_profile: "Arquivo de perfil JSON inválido",
+
+    updater_title: "Atualizador do 1boost",
+    updater_checking: "Verificando lançamentos no GitHub...",
+    updater_new_release: "Nova Versão Disponível",
+    updater_whats_new: "Novidades na",
+    updater_downloading: "Baixando Atualização...",
+    updater_installing: "Instalando...",
+    updater_relaunch_btn: "Reiniciar e Aplicar Atualização",
+    updater_latest: "Você está usando a versão mais recente!",
+    updater_up_to_date: "está atualizado.",
+    updater_check_again: "Verificar Novamente",
+    updater_retry: "Tentar Novamente",
   },
 };

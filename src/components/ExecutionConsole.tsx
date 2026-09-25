@@ -185,7 +185,7 @@ export const ExecutionConsole: React.FC<ExecutionConsoleProps> = ({ logs, onClea
         {filteredLogs.length === 0 ? (
           <div style={{ color: "var(--text-muted)", fontStyle: "italic", padding: "12px" }}>
             {logs.length === 0
-              ? '[1boost Console Ready] No execution logs recorded. Click "BOOST" on the main dashboard to run optimizations.'
+              ? t("console_empty_logs")
               : `[1boost Console] ${t("search_no_results").replace("{query}", searchQuery || filterLevel)}`}
           </div>
         ) : (

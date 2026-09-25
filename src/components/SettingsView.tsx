@@ -36,13 +36,13 @@ export const SettingsView: React.FC<SettingsViewProps> = ({
   const [pwdMsg, setPwdMsg] = useState<string | null>(null);
 
   const handlePromptSetPassword = async () => {
-    const pwd = window.prompt("Enter a security password for 1boost:");
+    const pwd = window.prompt(t("enter_password_prompt"));
     if (!pwd || !pwd.trim()) return;
 
     const hash = await hashPassword(pwd.trim());
     onSetLockHash(hash);
     setAppLockEnabled(true);
-    setPwdMsg("Security password set & app lock enabled!");
+    setPwdMsg(t("password_set_success"));
     setTimeout(() => setPwdMsg(null), 3000);
   };
 

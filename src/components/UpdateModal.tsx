@@ -1,6 +1,8 @@
 import React from "react";
 import { UpdateStatus } from "../hooks/useUpdater";
 import { AppLogoIcon } from "./AppLogoIcon";
+import { useTranslation } from "../i18n/useTranslation";
+import pkg from "../../package.json";
 
 interface UpdateModalProps {
   status: UpdateStatus;
@@ -15,6 +17,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
   onCheckAgain,
   onDownloadAndInstall,
 }) => {
+  const { t } = useTranslation();
   const progressPercent = status.totalBytes
     ? Math.min(100, Math.round((status.downloadedBytes / status.totalBytes) * 100))
     : 0;
@@ -57,11 +60,11 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <AppLogoIcon size={24} />
             <span style={{ fontWeight: 700, fontSize: "16px", color: "var(--text-primary)" }}>
-              1boost Auto-Updater
+              {t("updater_title")}
             </span>
           </div>
 
-          <button className="icon-btn-containerless" onClick={onClose} aria-label="Close">
+          <button className="icon-btn-containerless" onClick={onClose} aria-label={t("close")}>
             <span className="material-symbols-outlined">close</span>
           </button>
         </div>
@@ -76,7 +79,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
               sync
             </span>
             <p style={{ fontSize: "14px", fontWeight: 600, color: "var(--text-primary)" }}>
-              Checking GitHub Releases...
+              {t("updater_checking")}
             </p>
           </div>
         )}
@@ -97,7 +100,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             >
               <div>
                 <div style={{ fontSize: "11px", fontWeight: 700, color: "var(--accent-color)", textTransform: "uppercase" }}>
-                  New Release Available
+                  {t("updater_new_release")}
                 </div>
                 <div style={{ fontSize: "18px", fontWeight: 800, color: "var(--text-primary)", marginTop: "2px" }}>
                   v{status.version}
@@ -123,7 +126,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
               }}
             >
               <div style={{ fontWeight: 600, color: "var(--text-primary)", marginBottom: "6px" }}>
-                What's New in v{status.version}:
+                {t("updater_whats_new")} v{status.version}:
               </div>
               <p style={{ whiteSpace: "pre-wrap", margin: 0 }}>{status.body}</p>
             </div>
@@ -132,7 +135,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             {status.downloading && (
               <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: "12px", color: "var(--text-secondary)" }}>
-                  <span>Downloading Update...</span>
+                  <span>{t("updater_downloading")}</span>
                   <span>{progressPercent}%</span>
                 </div>
                 <div
@@ -163,7 +166,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
               style={{ width: "100%", justifyContent: "center" }}
             >
               <span className="material-symbols-outlined">download</span>
-              <span>{status.downloading ? "Installing..." : "Relaunch & Apply Update"}</span>
+              <span>{status.downloading ? t("updater_installing") : t("updater_relaunch_btn")}</span>
             </button>
           </div>
         )}
@@ -176,10 +179,10 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
             </span>
             <div>
               <div style={{ fontSize: "15px", fontWeight: 700, color: "var(--text-primary)" }}>
-                You are using the latest version!
+                {t("updater_latest")}
               </div>
               <div style={{ fontSize: "12px", color: "var(--text-secondary)", marginTop: "4px" }}>
-                1boost v1.1.12 is up to date.
+                1boost v{pkg.version} {t("updater_up_to_date")}
               </div>
             </div>
 
@@ -187,7 +190,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
               <span className="material-symbols-outlined" style={{ fontSize: "18px" }}>
                 refresh
               </span>
-              <span>Check Again</span>
+              <span>{t("updater_check_again")}</span>
             </button>
           </div>
         )}
@@ -199,7 +202,7 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
               {status.error}
             </div>
             <button className="btn-secondary" onClick={onCheckAgain}>
-              Retry Check
+              {t("updater_retry")}
             </button>
           </div>
         )}

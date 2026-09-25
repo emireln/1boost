@@ -273,27 +273,3 @@ body {
     transform: scale(1);
   }
 }
-
-/* War Room telemetry banner entrance */
-@keyframes warRoomFloatIn {
-  from {
-    opacity: 0;
-    transform: translateX(-50%) translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(-50%) translateY(0);
-  }
-}
-
-/* Auth right panel: softly blurred parallax starfield */
-.auth-parallax {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  filter: blur(2px);
-  pointer-events: none;
-  z-index: 0;
-}

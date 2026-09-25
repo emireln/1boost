@@ -58,7 +58,7 @@ export const TweakGrid: React.FC<TweakGridProps> = ({
     setUndoBusy("__all__");
     try {
       const count = await revertAllTweaks();
-      setUndoStatus(count > 0 ? `${count} tweak(s) reverted to original Windows state.` : "No revertible tweaks found.");
+      setUndoStatus(count > 0 ? `${count} ${t("tweaks_reverted_toast")}` : t("no_revertible_tweaks"));
       setTimeout(() => setUndoStatus(null), 3500);
     } catch (err: any) {
       setUndoStatus(err?.message || String(err));
@@ -100,7 +100,7 @@ export const TweakGrid: React.FC<TweakGridProps> = ({
           setTimeout(() => setUndoStatus(null), 3000);
         }
       } catch {
-        setUndoStatus("Invalid JSON profile file");
+        setUndoStatus(t("invalid_json_profile"));
         setTimeout(() => setUndoStatus(null), 3000);
       }
     };
