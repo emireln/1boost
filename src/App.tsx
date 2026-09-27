@@ -169,9 +169,25 @@ export const App: React.FC = () => {
         steps: selectedTweaks,
         createRestore: createRestorePoint,
       });
-    } catch (err: any) {
-      console.warn("Backend invoke error / dev simulation mode:", err);
-      simulateWebRun();
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : String(err);
+      if (import.meta.env.DEV) {
+        console.warn("Backend invoke error / dev simulation mode:", err);
+        simulateWebRun();
+        return;
+      }
+
+      setIsRunning(false);
+      setProgress(null);
+      setLogs((prev) => [
+        ...prev,
+        {
+          timestamp: new Date().toLocaleTimeString(),
+          level: "error",
+          message: `Optimization failed: ${message}`,
+          step_id: "error",
+        },
+      ]);
     }
   };
 
@@ -249,6 +265,7 @@ export const App: React.FC = () => {
         onTabChange={setActiveTab}
         isAdmin={isAdmin}
         osInfo={osInfo}
+        minimizeToTray={minimizeToTray}
       />
 
       {/* Main View Area based on Submenu Selected in Titlebar */}

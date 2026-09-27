@@ -13,6 +13,7 @@ interface TitleBarProps {
   onTabChange: (tab: ViewTab) => void;
   isAdmin: boolean;
   osInfo: string;
+  minimizeToTray: boolean;
 }
 
 export const TitleBar: React.FC<TitleBarProps> = ({
@@ -20,6 +21,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
   onTabChange,
   isAdmin,
   osInfo,
+  minimizeToTray,
 }) => {
   const [isMaximized, setIsMaximized] = useState(false);
   const { t } = useTranslation();
@@ -40,11 +42,15 @@ export const TitleBar: React.FC<TitleBarProps> = ({
     e.stopPropagation();
     e.preventDefault();
     try {
-      await invoke("minimize_window");
+      await invoke(minimizeToTray ? "hide_window" : "minimize_window");
     } catch {
       try {
         const appWindow = getCurrentWindow();
-        await appWindow.minimize();
+        if (minimizeToTray) {
+          await appWindow.hide();
+        } else {
+          await appWindow.minimize();
+        }
       } catch (err) {
         console.log("Minimize failed", err);
       }

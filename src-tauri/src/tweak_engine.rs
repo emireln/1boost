@@ -54,7 +54,18 @@ pub struct AppliedTweakInfo {
 fn run_powershell_script(script: &str) -> Result<String, String> {
     let mut cmd = Command::new("powershell.exe");
     cmd.creation_flags(CREATE_NO_WINDOW);
-    cmd.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script]);
+    let script = format!(
+        "$ErrorActionPreference = 'Stop';\n{}\nif ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}",
+        script
+    );
+    cmd.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
 
     match cmd.output() {
         Ok(output) => {
@@ -93,7 +104,8 @@ fn current_timestamp() -> String {
 }
 
 fn backups_dir() -> Result<PathBuf, String> {
-    let appdata = env::var("APPDATA").map_err(|_| "APPDATA environment variable not found".to_string())?;
+    let appdata =
+        env::var("APPDATA").map_err(|_| "APPDATA environment variable not found".to_string())?;
     let dir = Path::new(&appdata).join("1boost").join("backups");
     fs::create_dir_all(&dir).map_err(|e| format!("Failed to create backups directory: {}", e))?;
     Ok(dir)
@@ -103,7 +115,13 @@ fn backups_dir() -> Result<PathBuf, String> {
 fn safe_filename(tweak_id: &str) -> String {
     tweak_id
         .chars()
-        .map(|c| if c.is_ascii_alphanumeric() || c == '-' || c == '_' { c } else { '_' })
+        .map(|c| {
+            if c.is_ascii_alphanumeric() || c == '-' || c == '_' {
+                c
+            } else {
+                '_'
+            }
+        })
         .collect::<String>()
 }
 
@@ -115,29 +133,99 @@ fn escape_ps_single_quotes(input: &str) -> String {
     input.replace('\'', "''")
 }
 
-/// Reads the current value of a registry value. Returns None when absent.
-fn read_registry_value(path: &str, name: &str) -> Option<String> {
-    let script = format!(
-        "(Get-ItemProperty -Path '{}' -Name '{}' -ErrorAction SilentlyContinue).'{}'",
-        escape_ps_single_quotes(path),
-        escape_ps_single_quotes(name),
-        escape_ps_single_quotes(name)
-    );
-    match run_powershell_script(&script) {
-        Ok(value) if !value.is_empty() => Some(value),
-        _ => None,
+fn is_supported_registry_type(value_type: &str) -> bool {
+    matches!(
+        value_type.to_ascii_lowercase().as_str(),
+        "string" | "expandstring" | "binary" | "dword" | "multistring" | "qword"
+    )
+}
+
+fn powershell_value(value: &serde_json::Value, value_type: &str) -> Result<String, String> {
+    match value_type.to_ascii_lowercase().as_str() {
+        "string" | "expandstring" => match value {
+            serde_json::Value::String(value) => Ok(format!("'{}'", escape_ps_single_quotes(value))),
+            _ => Err("Registry string backup has an invalid value".to_string()),
+        },
+        "dword" | "qword" => match value {
+            serde_json::Value::Number(value) => Ok(value.to_string()),
+            _ => Err("Registry integer backup has an invalid value".to_string()),
+        },
+        "binary" | "multistring" => {
+            let serde_json::Value::Array(values) = value else {
+                return Err("Registry array backup has an invalid value".to_string());
+            };
+            let items = values
+                .iter()
+                .map(
+                    |value| match (value_type.to_ascii_lowercase().as_str(), value) {
+                        ("binary", serde_json::Value::Number(value)) => Ok(value.to_string()),
+                        ("multistring", serde_json::Value::String(value)) => {
+                            Ok(format!("'{}'", escape_ps_single_quotes(value)))
+                        }
+                        _ => Err("Registry array backup contains an invalid item".to_string()),
+                    },
+                )
+                .collect::<Result<Vec<_>, _>>()?;
+            let cast = if value_type.eq_ignore_ascii_case("Binary") {
+                "byte"
+            } else {
+                "string"
+            };
+            Ok(format!("[{}[]]@({})", cast, items.join(",")))
+        }
+        _ => Err(format!("Unsupported registry value type: {}", value_type)),
     }
 }
 
-fn snapshot_entry(entry: &RegistryEntry) -> EntrySnapshot {
-    let original = read_registry_value(&entry.path, &entry.name);
-    EntrySnapshot {
+/// Reads the current value of a registry value. Returns None when absent.
+fn read_registry_value(path: &str, name: &str) -> Result<Option<(String, String)>, String> {
+    let script = format!(
+        r#"$path = '{}'; $name = '{}';
+        $key = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue;
+        if ($null -eq $key -or $key.GetValueNames() -notcontains $name) {{
+            '{{"exists":false}}'
+        }} else {{
+            $kind = $key.GetValueKind($name).ToString();
+            $value = $key.GetValue($name, $null, [Microsoft.Win32.RegistryValueOptions]::DoNotExpandEnvironmentNames);
+            @{{ exists = $true; type = $kind; value = $value }} | ConvertTo-Json -Compress -Depth 10
+        }}"#,
+        escape_ps_single_quotes(path),
+        escape_ps_single_quotes(name)
+    );
+    let output = run_powershell_script(&script)?;
+    let snapshot: serde_json::Value = serde_json::from_str(&output)
+        .map_err(|e| format!("Failed to parse registry snapshot: {}", e))?;
+    if snapshot["exists"].as_bool() != Some(true) {
+        return Ok(None);
+    }
+    let value_type = snapshot["type"]
+        .as_str()
+        .ok_or_else(|| "Registry snapshot did not include a value type".to_string())?;
+    if !is_supported_registry_type(value_type) {
+        return Err(format!("Unsupported registry value type: {}", value_type));
+    }
+    let value = snapshot
+        .get("value")
+        .ok_or_else(|| "Registry snapshot did not include a value".to_string())?;
+    Ok(Some((value_type.to_string(), value.to_string())))
+}
+
+fn snapshot_entry(entry: &RegistryEntry) -> Result<EntrySnapshot, String> {
+    let original = read_registry_value(&entry.path, &entry.name)?;
+    let (value_type, original_value) = match original {
+        Some((value_type, value)) => (value_type, Some(value)),
+        None => (entry.value_type.clone(), None),
+    };
+    if !is_supported_registry_type(&value_type) {
+        return Err(format!("Unsupported registry value type: {}", value_type));
+    }
+    Ok(EntrySnapshot {
         path: entry.path.clone(),
         name: entry.name.clone(),
-        value_type: entry.value_type.clone(),
-        was_present: original.is_some(),
-        original_value: original,
-    }
+        value_type,
+        was_present: original_value.is_some(),
+        original_value,
+    })
 }
 
 /// Captures a pre-tweak snapshot and writes a backup file.
@@ -151,7 +239,23 @@ pub fn backup_tweak(step: &TweakStep) -> Result<bool, String> {
         return Ok(false);
     }
 
-    let entries: Vec<EntrySnapshot> = step.registry_entries.iter().map(snapshot_entry).collect();
+    let path = backup_path(&step.id)?;
+    if path.exists() {
+        let content = fs::read_to_string(&path)
+            .map_err(|e| format!("Failed to read existing backup: {}", e))?;
+        let existing: TweakBackup = serde_json::from_str(&content)
+            .map_err(|e| format!("Existing backup is corrupted: {}", e))?;
+        if existing.tweak_id != step.id {
+            return Err("Existing backup belongs to a different tweak".to_string());
+        }
+        return Ok(true);
+    }
+
+    let entries: Vec<EntrySnapshot> = step
+        .registry_entries
+        .iter()
+        .map(snapshot_entry)
+        .collect::<Result<_, _>>()?;
 
     let backup = TweakBackup {
         tweak_id: step.id.clone(),
@@ -163,8 +267,7 @@ pub fn backup_tweak(step: &TweakStep) -> Result<bool, String> {
 
     let json = serde_json::to_string_pretty(&backup)
         .map_err(|e| format!("Failed to serialize backup: {}", e))?;
-    fs::write(backup_path(&step.id)?, json)
-        .map_err(|e| format!("Failed to write backup file: {}", e))?;
+    fs::write(path, json).map_err(|e| format!("Failed to write backup file: {}", e))?;
 
     Ok(true)
 }
@@ -181,14 +284,18 @@ fn restore_registry_entry(entry: &EntrySnapshot) -> Result<(), String> {
     let name = escape_ps_single_quotes(&entry.name);
 
     if entry.was_present {
-        let value = entry.original_value.clone().unwrap_or_default();
-        let value_arg = if entry.value_type.eq_ignore_ascii_case("DWord") {
-            value // numeric passthrough
-        } else {
-            format!("'{}'", escape_ps_single_quotes(&value))
-        };
+        if !is_supported_registry_type(&entry.value_type) {
+            return Err(format!(
+                "Unsupported registry value type: {}",
+                entry.value_type
+            ));
+        }
+        let stored_value = entry.original_value.as_deref().unwrap_or_default();
+        let value: serde_json::Value = serde_json::from_str(stored_value)
+            .unwrap_or_else(|_| serde_json::Value::String(stored_value.to_string()));
+        let value_arg = powershell_value(&value, &entry.value_type)?;
         let script = format!(
-            "Set-ItemProperty -Path '{}' -Name '{}' -Type {} -Value {} -Force",
+            "New-ItemProperty -Path '{}' -Name '{}' -PropertyType {} -Value {} -Force | Out-Null",
             path, name, entry.value_type, value_arg
         );
         run_powershell_script(&script)?;
@@ -231,7 +338,11 @@ fn undo_tweak_inner(tweak_id: &str) -> Result<String, String> {
         "Reverted '{}' ({} registry value(s) restored{}).",
         backup.tweak_name,
         restored,
-        if backup.undo_script.is_some() { " + undo script executed" } else { "" }
+        if backup.undo_script.is_some() {
+            " + undo script executed"
+        } else {
+            ""
+        }
     ))
 }
 
@@ -316,6 +427,22 @@ mod tests {
         assert_eq!(parsed.entries.len(), 1);
         assert_eq!(parsed.entries[0].original_value.as_deref(), Some("1"));
         assert_eq!(parsed.undo_script.as_deref(), Some("Write-Output 'undo'"));
+    }
+
+    #[test]
+    fn restore_values_use_registry_type_safe_literals() {
+        let binary = serde_json::json!([144, 18, 3, 128]);
+        assert_eq!(
+            powershell_value(&binary, "Binary").unwrap(),
+            "[byte[]]@(144,18,3,128)"
+        );
+
+        let string = serde_json::json!("it's saved");
+        assert_eq!(
+            powershell_value(&string, "String").unwrap(),
+            "'it''s saved'"
+        );
+        assert!(powershell_value(&string, "Unknown").is_err());
     }
 
     #[test]

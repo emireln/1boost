@@ -139,7 +139,9 @@ fn detect_critical(content: &str) -> Vec<String> {
     }
 
     // 5. Defender disabling (Set-MpPreference -DisableRealtimeMonitoring $true)
-    if contains_phrase(content, "set-mppreference") && contains_phrase(content, "disablerealtimemonitoring") {
+    if contains_phrase(content, "set-mppreference")
+        && contains_phrase(content, "disablerealtimemonitoring")
+    {
         flags.push("Windows Defender real-time monitoring disable detected (Set-MpPreference -DisableRealtimeMonitoring)".to_string());
     }
 
@@ -156,11 +158,19 @@ fn detect_moderate(content: &str) -> Vec<String> {
     }
 
     // Network adapter deletion / firewall resets
-    if contains_phrase(content, "netsh advfirewall reset") || contains_phrase(content, "netsh firewall reset") {
-        flags.push("Resets Windows Firewall to default rules (netsh advfirewall reset)".to_string());
+    if contains_phrase(content, "netsh advfirewall reset")
+        || contains_phrase(content, "netsh firewall reset")
+    {
+        flags
+            .push("Resets Windows Firewall to default rules (netsh advfirewall reset)".to_string());
     }
-    if contains_phrase(content, "netsh interface delete") || contains_phrase(content, "netsh int ip reset") {
-        flags.push("Deletes or resets network adapters / TCP/IP stack (netsh interface delete)".to_string());
+    if contains_phrase(content, "netsh interface delete")
+        || contains_phrase(content, "netsh int ip reset")
+    {
+        flags.push(
+            "Deletes or resets network adapters / TCP/IP stack (netsh interface delete)"
+                .to_string(),
+        );
     }
 
     // Active service modifications outside standard telemetry targets
@@ -177,7 +187,8 @@ fn detect_moderate(content: &str) -> Vec<String> {
     {
         touches_services = true;
     }
-    let targets_telemetry = contains_phrase(content, "diagtrack") || contains_phrase(content, "dmwappushservice");
+    let targets_telemetry =
+        contains_phrase(content, "diagtrack") || contains_phrase(content, "dmwappushservice");
     if touches_services && !targets_telemetry {
         flags.push("Modifies Windows services outside standard telemetry targets".to_string());
     }
@@ -298,7 +309,18 @@ fn analyze_script_safety_inner(script_content: &str) -> ScriptSafetyReport {
 fn run_powershell_script(script: &str) -> Result<String, String> {
     let mut cmd = Command::new("powershell.exe");
     cmd.creation_flags(CREATE_NO_WINDOW);
-    cmd.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script]);
+    let script = format!(
+        "$ErrorActionPreference = 'Stop';\n{}\nif ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}",
+        script
+    );
+    cmd.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
 
     match cmd.output() {
         Ok(output) => {
@@ -364,7 +386,10 @@ pub fn analyze_script_safety(script_content: String, _script_type: String) -> Sc
 /// Gated local execution: refuses scripts that contain
 /// critical threat violations (score 0) before running.
 #[tauri::command]
-pub fn execute_custom_script(script_content: String, script_type: String) -> Result<ExecuteScriptResult, String> {
+pub fn execute_custom_script(
+    script_content: String,
+    script_type: String,
+) -> Result<ExecuteScriptResult, String> {
     let report = analyze_script_safety_inner(&script_content);
 
     if report.score == 0 || report.rating == "dangerous_blocked" {
@@ -387,8 +412,8 @@ pub fn execute_custom_script(script_content: String, script_type: String) -> Res
 /// discover filtering and crowdsourced toggle analytics.
 #[tauri::command]
 pub fn get_hardware_info() -> HardwareInfo {
-    let cpu_model = run_powershell_script("(Get-CimInstance Win32_Processor).Name")
-        .unwrap_or_default();
+    let cpu_model =
+        run_powershell_script("(Get-CimInstance Win32_Processor).Name").unwrap_or_default();
     let gpu_model = run_powershell_script(
         "(Get-CimInstance Win32_VideoController | Where-Object { $_.Name -and $_.PNPDeviceID -notlike 'ROOT*' } | Select-Object -First 1).Name",
     )
@@ -492,7 +517,7 @@ mod tests {
     #[test]
     fn allows_legit_optimization_scripts() {
         let r = report(
-            "Set-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name 'HwSchMode' -Value 2 -Type DWord -Force",
+            "New-ItemProperty -Path 'HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers' -Name 'HwSchMode' -Value 2 -PropertyType DWord -Force",
         );
         assert_eq!(r.score, 100);
         assert_eq!(r.rating, "verified_safe");

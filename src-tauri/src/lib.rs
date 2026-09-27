@@ -1,5 +1,9 @@
 use serde::{Deserialize, Serialize};
-use tauri::AppHandle;
+use tauri::{
+    menu::{Menu, MenuItem},
+    tray::{MouseButton, MouseButtonState, TrayIconBuilder, TrayIconEvent},
+    AppHandle, Manager,
+};
 
 pub mod script_safety;
 pub mod tweak_engine;
@@ -78,7 +82,18 @@ mod commands {
     fn run_powershell_script(script: &str) -> Result<String, String> {
         let mut cmd = Command::new("powershell.exe");
         cmd.creation_flags(CREATE_NO_WINDOW);
-        cmd.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script]);
+        let script = format!(
+            "$ErrorActionPreference = 'Stop';\n{}\nif ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}",
+            script
+        );
+        cmd.args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-Command",
+            &script,
+        ]);
 
         match cmd.output() {
             Ok(output) => {
@@ -183,7 +198,7 @@ mod commands {
                         step_id: "restore_point".to_string(),
                     },
                 );
-                Ok(true)
+                Ok(false)
             }
             Err(err) => {
                 let _ = app.emit(
@@ -228,13 +243,12 @@ mod commands {
             );
 
             match create_system_restore_point(app.clone()).await {
-                Ok(_) => {
+                Ok(true) => {
                     restore_point_created = true;
                     completed_steps += 1;
                 }
-                Err(_) => {
-                    failed_steps += 1;
-                }
+                Ok(false) => return Err("System Restore Point could not be created; optimization was stopped for safety.".to_string()),
+                Err(err) => return Err(format!("System Restore Point failed; optimization was stopped for safety: {}", err)),
             }
         }
 
@@ -271,7 +285,10 @@ mod commands {
                         TweakLogPayload {
                             timestamp: current_timestamp(),
                             level: "info".to_string(),
-                            message: format!("Snapshot saved - '{}' can be reverted later.", step.name),
+                            message: format!(
+                                "Snapshot saved - '{}' can be reverted later.",
+                                step.name
+                            ),
                             step_id: step.id.clone(),
                         },
                     );
@@ -282,7 +299,10 @@ mod commands {
                         TweakLogPayload {
                             timestamp: current_timestamp(),
                             level: "warning".to_string(),
-                            message: format!("'{}' is non-reversible (no undo data available).", step.name),
+                            message: format!(
+                                "'{}' is non-reversible (no undo data available).",
+                                step.name
+                            ),
                             step_id: step.id.clone(),
                         },
                     );
@@ -292,11 +312,16 @@ mod commands {
                         "tweak-log",
                         TweakLogPayload {
                             timestamp: current_timestamp(),
-                            level: "warning".to_string(),
-                            message: format!("Backup warning for '{}': {}", step.name, err),
+                            level: "error".to_string(),
+                            message: format!(
+                                "Skipped {} because its backup could not be saved: {}",
+                                step.name, err
+                            ),
                             step_id: step.id.clone(),
                         },
                     );
+                    failed_steps += 1;
+                    continue;
                 }
             }
 
@@ -349,7 +374,11 @@ mod commands {
             "tweak-log",
             TweakLogPayload {
                 timestamp: current_timestamp(),
-                level: if failed_steps == 0 { "success".to_string() } else { "warning".to_string() },
+                level: if failed_steps == 0 {
+                    "success".to_string()
+                } else {
+                    "warning".to_string()
+                },
                 message: format!(
                     "Optimization sequence finished: {} completed, {} failed in {:.2}s.",
                     completed_steps,
@@ -372,6 +401,37 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_process::init())
+        .setup(|app| {
+            let show_item = MenuItem::with_id(app, "show", "Show 1boost", true, None::<&str>)?;
+            let quit_item = MenuItem::with_id(app, "quit", "Quit", true, None::<&str>)?;
+            let menu = Menu::with_items(app, &[&show_item, &quit_item])?;
+            let mut tray = TrayIconBuilder::new()
+                .menu(&menu)
+                .show_menu_on_left_click(false)
+                .tooltip("1boost")
+                .on_menu_event(|app, event| match event.id.as_ref() {
+                    "show" => show_main_window(app),
+                    "quit" => app.exit(0),
+                    _ => (),
+                })
+                .on_tray_icon_event(|tray, event| {
+                    if matches!(
+                        event,
+                        TrayIconEvent::Click {
+                            button: MouseButton::Left,
+                            button_state: MouseButtonState::Up,
+                            ..
+                        }
+                    ) {
+                        show_main_window(tray.app_handle());
+                    }
+                });
+            if let Some(icon) = app.default_window_icon() {
+                tray = tray.icon(icon.clone());
+            }
+            tray.build(app)?;
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             commands::minimize_window,
             commands::hide_window,
@@ -396,4 +456,12 @@ pub fn run() {
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
+}
+
+fn show_main_window(app: &AppHandle) {
+    if let Some(window) = app.get_webview_window("main") {
+        let _ = window.unminimize();
+        let _ = window.show();
+        let _ = window.set_focus();
+    }
 }

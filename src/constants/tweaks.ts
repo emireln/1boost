@@ -32,10 +32,10 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DataCollection";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "AllowTelemetry" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "AllowTelemetry" -Value 0 -PropertyType DWord -Force | Out-Null;
       $fbPath = "HKCU:\\SOFTWARE\\Microsoft\\Siuf\\Rules";
       if (-not (Test-Path $fbPath)) { New-Item -Path $fbPath -Force | Out-Null };
-      Set-ItemProperty -Path $fbPath -Name "NumberOfSIUFInPeriod" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $fbPath -Name "NumberOfSIUFInPeriod" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Telemetry registry policies set to 0";
     `,
     registry_entries: [
@@ -53,10 +53,10 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\LocationAndSensors";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableLocation" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableLocation" -Value 1 -PropertyType DWord -Force | Out-Null;
       $consentPath = "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\CapabilityAccessManager\\ConsentStore\\location";
       if (-not (Test-Path $consentPath)) { New-Item -Path $consentPath -Force | Out-Null };
-      Set-ItemProperty -Path $consentPath -Name "Value" -Value "Deny" -Force;
+      Set-ItemProperty -Path $consentPath -Name "Value" -Value "Deny" -Force | Out-Null;
       Stop-Service -Name "lfsvc" -ErrorAction SilentlyContinue;
       Set-Service -Name "lfsvc" -StartupType Disabled -ErrorAction SilentlyContinue;
       Write-Output "Location tracking and sensor services disabled";
@@ -81,7 +81,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\AdvertisingInfo";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "Enabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "Enabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Advertising ID disabled";
     `,
     registry_entries: [
@@ -98,10 +98,10 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "Disabled" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "Disabled" -Value 1 -PropertyType DWord -Force | Out-Null;
       $consentPath = "HKCU:\\SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting";
       if (-not (Test-Path $consentPath)) { New-Item -Path $consentPath -Force | Out-Null };
-      Set-ItemProperty -Path $consentPath -Name "DontShowUI" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $consentPath -Name "DontShowUI" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Windows Error Reporting disabled";
     `,
     registry_entries: [
@@ -139,9 +139,9 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Gaming",
     description: "Disables Enhanced Pointer Precision (MouseSpeed, MouseThreshold) for true 1:1 mouse tracking in competitive games.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseSpeed" -Value "0" -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseThreshold1" -Value "0" -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseThreshold2" -Value "0" -Force;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseSpeed" -Value "0" -Force | Out-Null;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseThreshold1" -Value "0" -Force | Out-Null;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseThreshold2" -Value "0" -Force | Out-Null;
       Write-Output "Mouse Acceleration disabled for 1:1 raw tracking";
     `,
     registry_entries: [
@@ -158,7 +158,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Gaming",
     description: "Reduces MouseHoverTime to 8ms for instant cursor menu response and zero input delay.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseHoverTime" -Value "8" -Force;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Mouse" -Name "MouseHoverTime" -Value "8" -Force | Out-Null;
       Write-Output "Mouse hover time reduced to 8ms";
     `,
     registry_entries: [
@@ -175,7 +175,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\GraphicsDrivers";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "HwSchMode" -Value 2 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "HwSchMode" -Value 2 -PropertyType DWord -Force | Out-Null;
       Write-Output "Hardware-Accelerated GPU Scheduling set to 2 (Active)";
     `,
     registry_entries: [
@@ -191,13 +191,13 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     description: "Configures Multimedia Class Scheduler Service (MMCSS) to allocate 100% CPU priority and High GPU Priority to active games.",
     script: `
       $path = "HKLM:\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Multimedia\\SystemProfile";
-      Set-ItemProperty -Path $path -Name "SystemResponsiveness" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "NetworkThrottlingIndex" -Value 4294967295 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "SystemResponsiveness" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "NetworkThrottlingIndex" -Value 4294967295 -PropertyType DWord -Force | Out-Null;
       $gamePath = "$path\\Tasks\\Games";
       if (-not (Test-Path $gamePath)) { New-Item -Path $gamePath -Force | Out-Null };
-      Set-ItemProperty -Path $gamePath -Name "GPU Priority" -Value 8 -Type DWord -Force;
-      Set-ItemProperty -Path $gamePath -Name "Priority" -Value 6 -Type DWord -Force;
-      Set-ItemProperty -Path $gamePath -Name "Scheduling Category" -Value "High" -Type String -Force;
+      New-ItemProperty -Path $gamePath -Name "GPU Priority" -Value 8 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $gamePath -Name "Priority" -Value 6 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $gamePath -Name "Scheduling Category" -Value "High" -PropertyType String -Force | Out-Null;
       Write-Output "MMCSS game scheduler set to High GPU/CPU priority";
     `,
     registry_entries: [
@@ -218,8 +218,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\Software\\Microsoft\\GameBar";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "AllowAutoGameMode" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "AutoGameModeEnabled" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "AllowAutoGameMode" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "AutoGameModeEnabled" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Windows Game Mode enabled";
     `,
     registry_entries: [
@@ -235,10 +235,10 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Gaming",
     description: "Stops Xbox GameDVR background video encoding to eliminate frame drops and stuttering.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" -Name "AppCaptureEnabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\GameDVR" -Name "AppCaptureEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       $dvrPath = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\GameDVR";
       if (-not (Test-Path $dvrPath)) { New-Item -Path $dvrPath -Force | Out-Null };
-      Set-ItemProperty -Path $dvrPath -Name "AllowGameDVR" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $dvrPath -Name "AllowGameDVR" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Game DVR background recording disabled";
     `,
     registry_entries: [
@@ -258,8 +258,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $adapters = Get-ChildItem "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\Interfaces";
       foreach ($adapter in $adapters) {
-        Set-ItemProperty -Path $adapter.PSPath -Name "TcpAckFrequency" -Value 1 -Type DWord -ErrorAction SilentlyContinue;
-        Set-ItemProperty -Path $adapter.PSPath -Name "TCPNoDelay" -Value 1 -Type DWord -ErrorAction SilentlyContinue;
+        New-ItemProperty -Path $adapter.PSPath -Name "TcpAckFrequency" -Value 1 -PropertyType DWord -ErrorAction SilentlyContinue | Out-Null;
+        New-ItemProperty -Path $adapter.PSPath -Name "TCPNoDelay" -Value 1 -PropertyType DWord -ErrorAction SilentlyContinue | Out-Null;
       };
       Write-Output "Nagle's Algorithm disabled across all network adapters";
     `,
@@ -282,7 +282,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\DeliveryOptimization";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DODownloadMode" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DODownloadMode" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Delivery Optimization set to HTTP only (P2P disabled)";
     `,
     registry_entries: [
@@ -299,8 +299,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $adapters = Get-ChildItem "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Class\\{4d36e972-e325-11ce-bfc1-08002be10318}" -ErrorAction SilentlyContinue;
       foreach ($adapter in $adapters) {
-        Set-ItemProperty -Path $adapter.PSPath -Name "*EEE" -Value 0 -Type String -ErrorAction SilentlyContinue;
-        Set-ItemProperty -Path $adapter.PSPath -Name "EnableGreenEthernet" -Value 0 -Type String -ErrorAction SilentlyContinue;
+        New-ItemProperty -Path $adapter.PSPath -Name "*EEE" -Value 0 -PropertyType String -ErrorAction SilentlyContinue | Out-Null;
+        New-ItemProperty -Path $adapter.PSPath -Name "EnableGreenEthernet" -Value 0 -PropertyType String -ErrorAction SilentlyContinue | Out-Null;
       };
       Write-Output "Energy-Efficient Ethernet disabled on all adapters";
     `,
@@ -323,7 +323,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\USB";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableSelectiveSuspend" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableSelectiveSuspend" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "USB Selective Suspend disabled";
     `,
     registry_entries: [
@@ -360,7 +360,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerThrottling";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "PowerThrottlingOff" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "PowerThrottlingOff" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Power Throttling disabled";
     `,
     registry_entries: [
@@ -375,7 +375,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Power",
     description: "Forces all physical CPU cores active at 100% frequency without entering sleep states during intense workloads.",
     script: `
-      Set-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533751-8757-4890-8e3e-4d5a7454f7a7\\0cc5b647-c1df-4596-858a-6765809618a8" -Name "Attributes" -Value 0 -Type DWord -ErrorAction SilentlyContinue;
+      New-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Power\\PowerSettings\\54533751-8757-4890-8e3e-4d5a7454f7a7\\0cc5b647-c1df-4596-858a-6765809618a8" -Name "Attributes" -Value 0 -PropertyType DWord -ErrorAction SilentlyContinue | Out-Null;
       Write-Output "CPU Core Parking disabled";
     `,
     registry_entries: [
@@ -392,7 +392,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Memory Management";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "LargeSystemCache" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "LargeSystemCache" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Large System Cache enabled";
     `,
     registry_entries: [
@@ -411,7 +411,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\BackgroundAccessApplications";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "GlobalUserDisabled" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "GlobalUserDisabled" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Background apps global execution disabled";
     `,
     registry_entries: [
@@ -428,8 +428,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Explorer";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableSearchBoxSuggestions" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search" -Name "BingSearchEnabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableSearchBoxSuggestions" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Search" -Name "BingSearchEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Bing Start Menu search disabled";
     `,
     registry_entries: [
@@ -447,7 +447,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Dsh";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "AllowNewsAndInterests" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "AllowNewsAndInterests" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Widgets news feed disabled";
     `,
     registry_entries: [
@@ -464,10 +464,10 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Windows Search";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "AllowCortana" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "AllowCortana" -Value 0 -PropertyType DWord -Force | Out-Null;
       $voices = "HKCU:\\SOFTWARE\\Microsoft\\Speech_OneCore\\Settings\\VoiceActivation";
       if (-not (Test-Path $voices)) { New-Item -Path $voices -Force | Out-Null };
-      Set-ItemProperty -Path $voices -Name "AllowVoiceActivation" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $voices -Name "AllowVoiceActivation" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Cortana and voice activation disabled";
     `,
     registry_entries: [
@@ -485,9 +485,9 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\ContentDeliveryManager";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "SoftLandingEnabled" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "SystemPaneSuggestionsEnabled" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "SubscribedContent-338389Enabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "SoftLandingEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "SystemPaneSuggestionsEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "SubscribedContent-338389Enabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Windows tips and suggestions disabled";
     `,
     registry_entries: [
@@ -552,7 +552,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\Session Manager";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableWpbtExecution" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableWpbtExecution" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "WPBT execution disabled";
     `,
     registry_entries: [
@@ -569,7 +569,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\Device Metadata";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "PreventDeviceMetadataFromNetwork" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "PreventDeviceMetadataFromNetwork" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Device companion app installs blocked";
     `,
     registry_entries: [
@@ -588,9 +588,9 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\System";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "EnableActivityFeed" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "PublishUserActivities" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "UploadUserActivities" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "EnableActivityFeed" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "PublishUserActivities" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "UploadUserActivities" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Activity history tracking disabled";
     `,
     registry_entries: [
@@ -609,7 +609,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\CloudContent";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableWindowsConsumerFeatures" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableWindowsConsumerFeatures" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Consumer features disabled";
     `,
     registry_entries: [
@@ -628,7 +628,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced\\TaskbarDeveloperSettings";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "TaskbarEndTask" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "TaskbarEndTask" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Taskbar End Task enabled";
     `,
     registry_entries: [
@@ -661,8 +661,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\Software\\Policies\\Microsoft\\Windows\\Explorer";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableNotificationCenter" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications" -Name "ToastEnabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableNotificationCenter" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\PushNotifications" -Name "ToastEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Notifications & calendar disabled";
     `,
     registry_entries: [
@@ -696,9 +696,9 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Debloat",
     description: "Removes the Home and Gallery entries from the Explorer sidebar and opens This PC by default.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" -Name "System.IsPinnedToNameSpaceTree" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" -Name "System.IsPinnedToNameSpaceTree" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "LaunchTo" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\Software\\Classes\\CLSID\\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}" -Name "System.IsPinnedToNameSpaceTree" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Classes\\CLSID\\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}" -Name "System.IsPinnedToNameSpaceTree" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "LaunchTo" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Home & Gallery removed from Explorer";
     `,
     registry_entries: [
@@ -717,15 +717,15 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Edge";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "PersonalizationReportingEnabled" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "ShowRecommendationsEnabled" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "HideFirstRunExperience" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "UserFeedbackAllowed" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "ConfigureDoNotTrack" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "DiagnosticData" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "WebWidgetAllowed" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "ShowMicrosoftRewards" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "EdgeShoppingAssistantEnabled" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "PersonalizationReportingEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "ShowRecommendationsEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "HideFirstRunExperience" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "UserFeedbackAllowed" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "ConfigureDoNotTrack" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "DiagnosticData" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "WebWidgetAllowed" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "ShowMicrosoftRewards" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "EdgeShoppingAssistantEnabled" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Edge debloat policies applied";
     `,
     registry_entries: [
@@ -752,7 +752,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\System\\GameConfigStore";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "GameDVR_DXGIHonorFSEWindowsCompatible" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "GameDVR_DXGIHonorFSEWindowsCompatible" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Fullscreen Optimizations disabled";
     `,
     registry_entries: [
@@ -769,7 +769,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisabledComponents" -Value 32 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisabledComponents" -Value 32 -PropertyType DWord -Force | Out-Null;
       Write-Output "IPv4 preferred over IPv6";
     `,
     registry_entries: [
@@ -786,7 +786,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Services\\Tcpip6\\Parameters";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisabledComponents" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisabledComponents" -Value 1 -PropertyType DWord -Force | Out-Null;
       netsh interface teredo set state disabled;
       Write-Output "Teredo tunneling disabled";
     `,
@@ -809,7 +809,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     description: "Sets redundant services to manual and matches SvcHostSplitThresholdInKB to your RAM, cutting svchost.exe process count.",
     script: `
       $Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB;
-      Set-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control" -Name "SvcHostSplitThresholdInKB" -Value $Memory -Type DWord -Force;
+      New-ItemProperty -Path "HKLM:\\SYSTEM\\CurrentControlSet\\Control" -Name "SvcHostSplitThresholdInKB" -Value $Memory -PropertyType DWord -Force | Out-Null;
       Set-Service -Name "CscService" -StartupType Disabled -ErrorAction SilentlyContinue;
       Set-Service -Name "MapsBroker" -StartupType Manual -ErrorAction SilentlyContinue;
       Set-Service -Name "StorSvc" -StartupType Manual -ErrorAction SilentlyContinue;
@@ -836,19 +836,19 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Power",
     description: "Disables animations, shadows and transparency effects for snappier UI response on low-end hardware.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "DragFullWindows" -Value "0" -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "MenuShowDelay" -Value "200" -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop\\WindowMetrics" -Name "MinAnimate" -Value "0" -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Keyboard" -Name "KeyboardDelay" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ListviewAlphaSelect" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ListviewShadow" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "TaskbarAnimations" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects" -Name "VisualFXSetting" -Value 3 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\DWM" -Name "EnableAeroPeek" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "TaskbarMn" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ShowTaskViewButton" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search" -Name "SearchboxTaskbarMode" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "UserPreferencesMask" -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0)) -Force;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "DragFullWindows" -Value "0" -Force | Out-Null;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "MenuShowDelay" -Value "200" -Force | Out-Null;
+      Set-ItemProperty -Path "HKCU:\\Control Panel\\Desktop\\WindowMetrics" -Name "MinAnimate" -Value "0" -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Control Panel\\Keyboard" -Name "KeyboardDelay" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ListviewAlphaSelect" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ListviewShadow" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "TaskbarAnimations" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\VisualEffects" -Name "VisualFXSetting" -Value 3 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\DWM" -Name "EnableAeroPeek" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "TaskbarMn" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "ShowTaskViewButton" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search" -Name "SearchboxTaskbarMode" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "UserPreferencesMask" -PropertyType Binary -Value ([byte[]](144,18,3,128,16,0,0,0)) -Force | Out-Null;
       Write-Output "Visual effects set to best performance";
     `,
     registry_entries: [
@@ -864,11 +864,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
       { path: "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", name: "TaskbarMn", type: "DWord" },
       { path: "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced", name: "ShowTaskViewButton", type: "DWord" },
       { path: "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Search", name: "SearchboxTaskbarMode", type: "DWord" },
+      { path: "HKCU:\\Control Panel\\Desktop", name: "UserPreferencesMask", type: "Binary" },
     ],
-    undo_script: `
-      Remove-ItemProperty -Path "HKCU:\\Control Panel\\Desktop" -Name "UserPreferencesMask" -ErrorAction SilentlyContinue;
-      Write-Output "Visual effects mask restored";
-    `,
     risk: "advanced",
     enabled: false,
   },
@@ -878,20 +875,14 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Power",
     description: "Stops Explorer from guessing folder types (music, pictures...) which slows browsing. WARNING: disables Explorer grouping.",
     script: `
-      Remove-Item -Path "HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags" -Recurse -Force -ErrorAction SilentlyContinue;
-      Remove-Item -Path "HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\BagMRU" -Recurse -Force -ErrorAction SilentlyContinue;
       $allFolders = "HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell";
       if (-not (Test-Path $allFolders)) { New-Item -Path $allFolders -Force | Out-Null };
-      New-ItemProperty -Path $allFolders -Name "FolderType" -Value "NotSpecified" -PropertyType String -Force;
+      New-ItemProperty -Path $allFolders -Name "FolderType" -Value "NotSpecified" -PropertyType String -Force | Out-Null;
       Write-Output "Explorer folder type discovery disabled (restart Explorer to apply)";
     `,
     registry_entries: [
       { path: "HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell", name: "FolderType", type: "String" },
     ],
-    undo_script: `
-      Remove-ItemProperty -Path "HKCU:\\Software\\Classes\\Local Settings\\Software\\Microsoft\\Windows\\Shell\\Bags\\AllFolders\\Shell" -Name "FolderType" -ErrorAction SilentlyContinue;
-      Write-Output "Explorer folder type discovery restored";
-    `,
     risk: "safe",
     enabled: true,
   },
@@ -905,7 +896,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\StorageSense\\Parameters\\StoragePolicy";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "01" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "01" -Value 0 -PropertyType DWord -Force | Out-Null;
       Write-Output "Storage Sense disabled";
     `,
     registry_entries: [
@@ -934,8 +925,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Preferences",
     description: "Switches the system and apps to dark mode (restarts Explorer to apply instantly).",
     script: `
-      Set-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" -Name "AppsUseLightTheme" -Value 0 -Type DWord -Force;
-      Set-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" -Name "SystemUsesLightTheme" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" -Name "AppsUseLightTheme" -Value 0 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path "HKCU:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize" -Name "SystemUsesLightTheme" -Value 0 -PropertyType DWord -Force | Out-Null;
       Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue;
       Write-Output "Dark theme enabled";
     `,
@@ -955,7 +946,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Preferences",
     description: "Displays .exe, .png and other file extensions in File Explorer (restarts Explorer to apply instantly).",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "HideFileExt" -Value 0 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "HideFileExt" -Value 0 -PropertyType DWord -Force | Out-Null;
       Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue;
       Write-Output "File extensions shown";
     `,
@@ -974,7 +965,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Preferences",
     description: "Shows hidden files and folders in File Explorer (restarts Explorer to apply instantly).",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "Hidden" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "Hidden" -Value 1 -PropertyType DWord -Force | Out-Null;
       Stop-Process -Name explorer -Force -ErrorAction SilentlyContinue;
       Write-Output "Hidden files revealed";
     `,
@@ -993,7 +984,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     category: "Preferences",
     description: "Displays the numeric battery percentage next to the battery icon in the system tray.",
     script: `
-      Set-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "IsBatteryPercentageEnabled" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path "HKCU:\\Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced" -Name "IsBatteryPercentageEnabled" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Battery percentage enabled";
     `,
     registry_entries: [
@@ -1010,7 +1001,7 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Policies\\System";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "VerboseStatus" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "VerboseStatus" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Verbose logon messages enabled";
     `,
     registry_entries: [
@@ -1027,8 +1018,8 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
     script: `
       $path = "HKLM:\\SYSTEM\\CurrentControlSet\\Control\\CrashControl";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisplayParameters" -Value 1 -Type DWord -Force;
-      Set-ItemProperty -Path $path -Name "DisableEmoticon" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisplayParameters" -Value 1 -PropertyType DWord -Force | Out-Null;
+      New-ItemProperty -Path $path -Name "DisableEmoticon" -Value 1 -PropertyType DWord -Force | Out-Null;
       Write-Output "Detailed BSoD info enabled";
     `,
     registry_entries: [
@@ -1047,24 +1038,17 @@ export const DEFAULT_TWEAKS: TweakStep[] = [
       Stop-Process -Name "OneDrive" -Force -ErrorAction SilentlyContinue;
       $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive";
       if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-      Set-ItemProperty -Path $path -Name "DisableFileSyncNGSC" -Value 1 -Type DWord -Force;
+      New-ItemProperty -Path $path -Name "DisableFileSyncNGSC" -Value 1 -PropertyType DWord -Force | Out-Null;
       $clsid = "HKCR:\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}";
-      if (Test-Path $clsid) { Set-ItemProperty -Path $clsid -Name "System.IsPinnedToNameSpaceTree" -Value 0 -Type DWord -Force };
+      if (Test-Path $clsid) { New-ItemProperty -Path $clsid -Name "System.IsPinnedToNameSpaceTree" -Value 0 -PropertyType DWord -Force | Out-Null };
       $clsid64 = "HKCR:\\Wow6432Node\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}";
-      if (Test-Path $clsid64) { Set-ItemProperty -Path $clsid64 -Name "System.IsPinnedToNameSpaceTree" -Value 0 -Type DWord -Force };
+      if (Test-Path $clsid64) { New-ItemProperty -Path $clsid64 -Name "System.IsPinnedToNameSpaceTree" -Value 0 -PropertyType DWord -Force | Out-Null };
       Write-Output "OneDrive disabled and removed from Explorer sidebar";
-    `,
-    undo_script: `
-      $path = "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive";
-      if (Test-Path $path) { Set-ItemProperty -Path $path -Name "DisableFileSyncNGSC" -Value 0 -Type DWord -Force };
-      $clsid = "HKCR:\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}";
-      if (Test-Path $clsid) { Set-ItemProperty -Path $clsid -Name "System.IsPinnedToNameSpaceTree" -Value 1 -Type DWord -Force };
-      $clsid64 = "HKCR:\\Wow6432Node\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}";
-      if (Test-Path $clsid64) { Set-ItemProperty -Path $clsid64 -Name "System.IsPinnedToNameSpaceTree" -Value 1 -Type DWord -Force };
-      Write-Output "OneDrive policy and Explorer pin restored";
     `,
     registry_entries: [
       { path: "HKLM:\\SOFTWARE\\Policies\\Microsoft\\Windows\\OneDrive", name: "DisableFileSyncNGSC", type: "DWord" },
+      { path: "HKCR:\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}", name: "System.IsPinnedToNameSpaceTree", type: "DWord" },
+      { path: "HKCR:\\Wow6432Node\\CLSID\\{018D5C66-4533-4307-9B53-224DE2ED1FE6}", name: "System.IsPinnedToNameSpaceTree", type: "DWord" },
     ],
     risk: "advanced",
     enabled: false,

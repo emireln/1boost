@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useTranslation } from "../i18n/useTranslation";
-import { APP_LOGO_URL, CURATED_APPS } from "../constants/utilities";
+import { CURATED_APPS } from "../constants/utilities";
 import {
   DnsPreset,
   enableWindowsFeature,
@@ -22,63 +22,26 @@ interface StatusMsg {
   error: boolean;
 }
 
-/**
- * App brand icon with graceful degradation:
- * - image error -> generic letter avatar
- * - loaded -> official favicon logo on white backing for visibility
- */
-const AppLogo: React.FC<{ domain: string; name: string }> = ({ domain, name }) => {
-  const [failed, setFailed] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-
-  useEffect(() => {
-    setFailed(false);
-    setLoaded(false);
-  }, [domain]);
-
-  const showImage = !failed;
-
-  return (
-    <div
-      style={{
-        width: "40px",
-        height: "40px",
-        borderRadius: "8px",
-        backgroundColor: "var(--surface-2)",
-        border: "1px solid var(--outline-border)",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
-    >
-      {(!showImage || !loaded) && (
-        <span style={{ fontSize: "16px", fontWeight: 800, color: "var(--accent-color)" }}>
-          {name[0]?.toUpperCase() || "?"}
-        </span>
-      )}
-      {showImage && (
-        <img
-          src={APP_LOGO_URL(domain)}
-          alt=""
-          draggable={false}
-          onLoad={() => setLoaded(true)}
-          onError={() => setFailed(true)}
-          style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "contain",
-            padding: "3px",
-            backgroundColor: "#FFFFFF",
-            opacity: loaded ? 1 : 0,
-            transition: "opacity 0.2s ease",
-          }}
-        />
-      )}
-    </div>
-  );
-};
+const AppLogo: React.FC<{ name: string }> = ({ name }) => (
+  <div
+    style={{
+      width: "40px",
+      height: "40px",
+      borderRadius: "8px",
+      backgroundColor: "var(--surface-2)",
+      border: "1px solid var(--outline-border)",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flexShrink: 0,
+      fontSize: "16px",
+      fontWeight: 800,
+      color: "var(--accent-color)",
+    }}
+  >
+    {name[0]?.toUpperCase() || "?"}
+  </div>
+);
 
 export const UtilitiesTab: React.FC = () => {
   const { t } = useTranslation();
@@ -602,7 +565,7 @@ export const UtilitiesTab: React.FC = () => {
                   }}
                 >
                   <div style={{ display: "flex", alignItems: "center", gap: "10px", minWidth: 0 }}>
-                    <AppLogo domain={app.domain} name={app.name} />
+                    <AppLogo name={app.name} />
                     <div style={{ minWidth: 0 }}>
                       <div style={{ fontSize: "12.5px", fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
                         {app.name}

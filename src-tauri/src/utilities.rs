@@ -35,7 +35,18 @@ fn current_timestamp() -> String {
 fn run_powershell_script(script: &str) -> Result<String, String> {
     let mut cmd = Command::new("powershell.exe");
     cmd.creation_flags(CREATE_NO_WINDOW);
-    cmd.args(["-NoProfile", "-NonInteractive", "-ExecutionPolicy", "Bypass", "-Command", script]);
+    let script = format!(
+        "$ErrorActionPreference = 'Stop';\n{}\nif ($null -ne $LASTEXITCODE -and $LASTEXITCODE -ne 0) {{ exit $LASTEXITCODE }}",
+        script
+    );
+    cmd.args([
+        "-NoProfile",
+        "-NonInteractive",
+        "-ExecutionPolicy",
+        "Bypass",
+        "-Command",
+        &script,
+    ]);
 
     match cmd.output() {
         Ok(output) => {
@@ -83,15 +94,78 @@ pub struct DnsPreset {
 
 fn dns_presets() -> Vec<DnsPreset> {
     vec![
-        DnsPreset { key: "default".into(), label: "Default / DHCP".into(), ipv4_primary: "".into(), ipv4_secondary: "".into(), ipv6_primary: "".into(), ipv6_secondary: "".into() },
-        DnsPreset { key: "google".into(), label: "Google".into(), ipv4_primary: "8.8.8.8".into(), ipv4_secondary: "8.8.4.4".into(), ipv6_primary: "2001:4860:4860::8888".into(), ipv6_secondary: "2001:4860:4860::8844".into() },
-        DnsPreset { key: "cloudflare".into(), label: "Cloudflare".into(), ipv4_primary: "1.1.1.1".into(), ipv4_secondary: "1.0.0.1".into(), ipv6_primary: "2606:4700:4700::1111".into(), ipv6_secondary: "2606:4700:4700::1001".into() },
-        DnsPreset { key: "cloudflare_malware".into(), label: "Cloudflare (Malware Blocking)".into(), ipv4_primary: "1.1.1.2".into(), ipv4_secondary: "1.0.0.2".into(), ipv6_primary: "2606:4700:4700::1112".into(), ipv6_secondary: "2606:4700:4700::1002".into() },
-        DnsPreset { key: "cloudflare_family".into(), label: "Cloudflare (Malware + Adult)".into(), ipv4_primary: "1.1.1.3".into(), ipv4_secondary: "1.0.0.3".into(), ipv6_primary: "2606:4700:4700::1113".into(), ipv6_secondary: "2606:4700:4700::1003".into() },
-        DnsPreset { key: "opendns".into(), label: "OpenDNS".into(), ipv4_primary: "208.67.222.222".into(), ipv4_secondary: "208.67.220.220".into(), ipv6_primary: "2620:119:35::35".into(), ipv6_secondary: "2620:119:53::53".into() },
-        DnsPreset { key: "quad9".into(), label: "Quad9".into(), ipv4_primary: "9.9.9.9".into(), ipv4_secondary: "149.112.112.112".into(), ipv6_primary: "2620:fe::fe".into(), ipv6_secondary: "2620:fe::9".into() },
-        DnsPreset { key: "adguard".into(), label: "AdGuard (Ads + Trackers)".into(), ipv4_primary: "94.140.14.14".into(), ipv4_secondary: "94.140.15.15".into(), ipv6_primary: "2a10:50c0::ad1:ff".into(), ipv6_secondary: "2a10:50c0::ad2:ff".into() },
-        DnsPreset { key: "adguard_family".into(), label: "AdGuard (Ads + Malware + Adult)".into(), ipv4_primary: "94.140.14.15".into(), ipv4_secondary: "94.140.15.16".into(), ipv6_primary: "2a10:50c0::bad1:ff".into(), ipv6_secondary: "2a10:50c0::bad2:ff".into() },
+        DnsPreset {
+            key: "default".into(),
+            label: "Default / DHCP".into(),
+            ipv4_primary: "".into(),
+            ipv4_secondary: "".into(),
+            ipv6_primary: "".into(),
+            ipv6_secondary: "".into(),
+        },
+        DnsPreset {
+            key: "google".into(),
+            label: "Google".into(),
+            ipv4_primary: "8.8.8.8".into(),
+            ipv4_secondary: "8.8.4.4".into(),
+            ipv6_primary: "2001:4860:4860::8888".into(),
+            ipv6_secondary: "2001:4860:4860::8844".into(),
+        },
+        DnsPreset {
+            key: "cloudflare".into(),
+            label: "Cloudflare".into(),
+            ipv4_primary: "1.1.1.1".into(),
+            ipv4_secondary: "1.0.0.1".into(),
+            ipv6_primary: "2606:4700:4700::1111".into(),
+            ipv6_secondary: "2606:4700:4700::1001".into(),
+        },
+        DnsPreset {
+            key: "cloudflare_malware".into(),
+            label: "Cloudflare (Malware Blocking)".into(),
+            ipv4_primary: "1.1.1.2".into(),
+            ipv4_secondary: "1.0.0.2".into(),
+            ipv6_primary: "2606:4700:4700::1112".into(),
+            ipv6_secondary: "2606:4700:4700::1002".into(),
+        },
+        DnsPreset {
+            key: "cloudflare_family".into(),
+            label: "Cloudflare (Malware + Adult)".into(),
+            ipv4_primary: "1.1.1.3".into(),
+            ipv4_secondary: "1.0.0.3".into(),
+            ipv6_primary: "2606:4700:4700::1113".into(),
+            ipv6_secondary: "2606:4700:4700::1003".into(),
+        },
+        DnsPreset {
+            key: "opendns".into(),
+            label: "OpenDNS".into(),
+            ipv4_primary: "208.67.222.222".into(),
+            ipv4_secondary: "208.67.220.220".into(),
+            ipv6_primary: "2620:119:35::35".into(),
+            ipv6_secondary: "2620:119:53::53".into(),
+        },
+        DnsPreset {
+            key: "quad9".into(),
+            label: "Quad9".into(),
+            ipv4_primary: "9.9.9.9".into(),
+            ipv4_secondary: "149.112.112.112".into(),
+            ipv6_primary: "2620:fe::fe".into(),
+            ipv6_secondary: "2620:fe::9".into(),
+        },
+        DnsPreset {
+            key: "adguard".into(),
+            label: "AdGuard (Ads + Trackers)".into(),
+            ipv4_primary: "94.140.14.14".into(),
+            ipv4_secondary: "94.140.15.15".into(),
+            ipv6_primary: "2a10:50c0::ad1:ff".into(),
+            ipv6_secondary: "2a10:50c0::ad2:ff".into(),
+        },
+        DnsPreset {
+            key: "adguard_family".into(),
+            label: "AdGuard (Ads + Malware + Adult)".into(),
+            ipv4_primary: "94.140.14.15".into(),
+            ipv4_secondary: "94.140.15.16".into(),
+            ipv6_primary: "2a10:50c0::bad1:ff".into(),
+            ipv6_secondary: "2a10:50c0::bad2:ff".into(),
+        },
     ]
 }
 
@@ -146,7 +220,11 @@ pub fn set_dns_provider(provider_key: String) -> Result<String, String> {
         run_powershell_script(&script)?;
         Ok(format!(
             "DNS switched to {} (IPv4 {} / {}, IPv6 {} / {})",
-            preset.label, preset.ipv4_primary, preset.ipv4_secondary, preset.ipv6_primary, preset.ipv6_secondary
+            preset.label,
+            preset.ipv4_primary,
+            preset.ipv4_secondary,
+            preset.ipv6_primary,
+            preset.ipv6_secondary
         ))
     }
 }
@@ -158,37 +236,43 @@ pub fn set_dns_provider(provider_key: String) -> Result<String, String> {
 #[tauri::command]
 pub fn set_update_mode(mode: String) -> Result<String, String> {
     let script = match mode.as_str() {
-        "default" => r#"
+        "default" => {
+            r#"
             Remove-Item -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Recurse -Force -ErrorAction SilentlyContinue;
             Set-Service -Name wuauserv -StartupType Automatic -ErrorAction SilentlyContinue;
             Start-Service -Name wuauserv -ErrorAction SilentlyContinue;
             Write-Output "Windows Update restored to default behavior"
-        "#,
-        "security" => r#"
+        "#
+        }
+        "security" => {
+            r#"
             $path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate";
             if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
-            Set-ItemProperty -Path $path -Name "DeferFeatureUpdates" -Value 1 -Type DWord -Force;
-            Set-ItemProperty -Path $path -Name "DeferFeatureUpdatesPeriodInDays" -Value 365 -Type DWord -Force;
-            Set-ItemProperty -Path $path -Name "DeferQualityUpdates" -Value 1 -Type DWord -Force;
-            Set-ItemProperty -Path $path -Name "DeferQualityUpdatesPeriodInDays" -Value 4 -Type DWord -Force;
+            New-ItemProperty -Path $path -Name "DeferFeatureUpdates" -Value 1 -PropertyType DWord -Force;
+            New-ItemProperty -Path $path -Name "DeferFeatureUpdatesPeriodInDays" -Value 365 -PropertyType DWord -Force;
+            New-ItemProperty -Path $path -Name "DeferQualityUpdates" -Value 1 -PropertyType DWord -Force;
+            New-ItemProperty -Path $path -Name "DeferQualityUpdatesPeriodInDays" -Value 4 -PropertyType DWord -Force;
             $au = "$path\AU";
             if (-not (Test-Path $au)) { New-Item -Path $au -Force | Out-Null };
-            Set-ItemProperty -Path $au -Name "NoAutoUpdate" -Value 0 -Type DWord -Force;
+            New-ItemProperty -Path $au -Name "NoAutoUpdate" -Value 0 -PropertyType DWord -Force;
             Set-Service -Name wuauserv -StartupType Automatic -ErrorAction SilentlyContinue;
             Start-Service -Name wuauserv -ErrorAction SilentlyContinue;
             Write-Output "Windows Update set to Security mode (365d feature / 4d security delays)"
-        "#,
-        "disable" => r#"
+        "#
+        }
+        "disable" => {
+            r#"
             $path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate";
             if (-not (Test-Path $path)) { New-Item -Path $path -Force | Out-Null };
             $au = "$path\AU";
             if (-not (Test-Path $au)) { New-Item -Path $au -Force | Out-Null };
-            Set-ItemProperty -Path $au -Name "NoAutoUpdate" -Value 1 -Type DWord -Force;
-            Set-ItemProperty -Path $path -Name "DisableWUfMServicing" -Value 1 -Type DWord -Force;
+            New-ItemProperty -Path $au -Name "NoAutoUpdate" -Value 1 -PropertyType DWord -Force;
+            New-ItemProperty -Path $path -Name "DisableWUfMServicing" -Value 1 -PropertyType DWord -Force;
             Stop-Service -Name wuauserv -ErrorAction SilentlyContinue;
             Set-Service -Name wuauserv -StartupType Disabled -ErrorAction SilentlyContinue;
             Write-Output "Windows Update disabled (all updates)"
-        "#,
+        "#
+        }
         _ => return Err("Unknown update mode".to_string()),
     };
 
@@ -287,29 +371,52 @@ pub async fn run_system_fix(app: AppHandle, fix_id: String) -> Result<String, St
 // --------------------------------------------------------
 
 #[tauri::command]
-pub async fn enable_windows_feature(app: AppHandle, feature_id: String, enable: bool) -> Result<String, String> {
+pub async fn enable_windows_feature(
+    app: AppHandle,
+    feature_id: String,
+    enable: bool,
+) -> Result<String, String> {
     let (label, feature_names) = match feature_id.as_str() {
         "dotnet" => (".NET Framework (2, 3, 4)", "NetFx3,NetFx4-AdvSrvs"),
-        "wsl" => ("Windows Subsystem for Linux", "VirtualMachinePlatform,Microsoft-Windows-Subsystem-Linux"),
+        "wsl" => (
+            "Windows Subsystem for Linux",
+            "VirtualMachinePlatform,Microsoft-Windows-Subsystem-Linux",
+        ),
         "hyperv" => ("Hyper-V", "Microsoft-Hyper-V-All"),
-        "legacy_media" => ("Legacy Media Components", "WindowsMediaPlayer,MediaPlayback,DirectPlay,LegacyComponents"),
+        "legacy_media" => (
+            "Legacy Media Components",
+            "WindowsMediaPlayer,MediaPlayback,DirectPlay,LegacyComponents",
+        ),
         "sandbox" => ("Windows Sandbox", "Containers-DisposableClientVM"),
-        "nfs" => ("Network File System (NFS)", "ServicesForNFS-ClientOnly,ClientForNFS-Infrastructure,NFS-Administration"),
+        "nfs" => (
+            "Network File System (NFS)",
+            "ServicesForNFS-ClientOnly,ClientForNFS-Infrastructure,NFS-Administration",
+        ),
         "regbackup" => ("Daily Registry Backup Task", ""),
         _ => return Err("Unknown Windows feature".to_string()),
     };
 
     if feature_id == "dotnet" && !enable {
-        return Err("Disabling .NET Framework is not supported (many apps depend on it)".to_string());
+        return Err(
+            "Disabling .NET Framework is not supported (many apps depend on it)".to_string(),
+        );
     }
 
-    emit_log(&app, "info", format!("{} {}...", if enable { "Enabling" } else { "Disabling" }, label));
+    emit_log(
+        &app,
+        "info",
+        format!(
+            "{} {}...",
+            if enable { "Enabling" } else { "Disabling" },
+            label
+        ),
+    );
 
     let script = if feature_id == "regbackup" {
         if enable {
             r#"
-                New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager' -Name 'EnablePeriodicBackup' -Type DWord -Value 1 -Force;
-                New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager' -Name 'BackupCount' -Type DWord -Value 2 -Force;
+                New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager' -Name 'EnablePeriodicBackup' -PropertyType DWord -Value 1 -Force;
+                New-ItemProperty -Path 'HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Configuration Manager' -Name 'BackupCount' -PropertyType DWord -Value 2 -Force;
                 $action = New-ScheduledTaskAction -Execute 'schtasks' -Argument '/run /i /tn "\Microsoft\Windows\Registry\RegIdleBackup"';
                 $trigger = New-ScheduledTaskTrigger -Daily -At 00:30;
                 Register-ScheduledTask -Action $action -Trigger $trigger -TaskName 'AutoRegBackup' -Description 'Create System Registry Backups' -User 'System' -Force;
@@ -362,16 +469,46 @@ pub async fn run_winget(app: AppHandle, action: String, target: String) -> Resul
 
     match action.as_str() {
         "install" => {
-            cmd.args(["--id", &target, "-e", "--source", "winget", "--accept-package-agreements", "--accept-source-agreements", "--silent", "--disable-interactivity"]);
+            cmd.args([
+                "--id",
+                &target,
+                "-e",
+                "--source",
+                "winget",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--silent",
+                "--disable-interactivity",
+            ]);
         }
         "uninstall" => {
-            cmd.args(["--id", &target, "-e", "--accept-package-agreements", "--accept-source-agreements", "--silent", "--disable-interactivity"]);
+            cmd.args([
+                "--id",
+                &target,
+                "-e",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--silent",
+                "--disable-interactivity",
+            ]);
         }
         "upgrade_all" => {
-            cmd.args(["--upgrade", "--all", "--accept-package-agreements", "--accept-source-agreements", "--silent", "--disable-interactivity"]);
+            cmd.args([
+                "--upgrade",
+                "--all",
+                "--accept-package-agreements",
+                "--accept-source-agreements",
+                "--silent",
+                "--disable-interactivity",
+            ]);
         }
         "search" => {
-            cmd.args(["--search", &target, "--accept-source-agreements", "--disable-interactivity"]);
+            cmd.args([
+                "--search",
+                &target,
+                "--accept-source-agreements",
+                "--disable-interactivity",
+            ]);
         }
         "list" => {
             cmd.args(["--list", "--accept-source-agreements"]);
@@ -379,19 +516,37 @@ pub async fn run_winget(app: AppHandle, action: String, target: String) -> Resul
         _ => return Err("Unknown winget action".to_string()),
     }
 
-    let output = cmd.output().map_err(|e| format!("winget is not installed or failed to launch: {}", e))?;
+    let output = cmd
+        .output()
+        .map_err(|e| format!("winget is not installed or failed to launch: {}", e))?;
     let stdout = String::from_utf8_lossy(&output.stdout).to_string();
     let stderr = String::from_utf8_lossy(&output.stderr).to_string();
-    let combined = if stdout.trim().is_empty() { stderr.trim().to_string() } else { stdout.trim().to_string() };
+    let combined = if stdout.trim().is_empty() {
+        stderr.trim().to_string()
+    } else {
+        stdout.trim().to_string()
+    };
 
     emit_log(
         &app,
-        if output.status.success() { "success" } else { "warning" },
-        format!("winget {} -> {}", action, combined.lines().last().unwrap_or("done")),
+        if output.status.success() {
+            "success"
+        } else {
+            "warning"
+        },
+        format!(
+            "winget {} -> {}",
+            action,
+            combined.lines().last().unwrap_or("done")
+        ),
     );
 
-    if !output.status.success() && combined.is_empty() {
-        return Err(format!("winget exited with code {}", output.status));
+    if !output.status.success() {
+        return Err(if combined.is_empty() {
+            format!("winget exited with code {}", output.status)
+        } else {
+            combined
+        });
     }
 
     Ok(combined)
