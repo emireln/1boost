@@ -32,3 +32,6 @@ dist-ssr
 # Rust / Tauri build artifacts
 src-tauri/target
 
+
+# Website
+website/
