@@ -3,6 +3,7 @@ import { invoke } from "@tauri-apps/api/core";
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { Tooltip } from "./GlobalTooltip";
 import { AppLogoIcon } from "./AppLogoIcon";
+import { LogoBanner } from "./LogoBanner";
 import { useTranslation } from "../i18n/useTranslation";
 import { Translations } from "../i18n/translations";
 
@@ -117,10 +118,11 @@ export const TitleBar: React.FC<TitleBarProps> = ({
       {/* Left: App Branding (Clickable Logo Redirection to Dashboard without Tooltip) & Admin Status */}
       <div
         data-tauri-drag-region
+        className="titlebar-brand"
         style={{
           display: "flex",
           alignItems: "center",
-          gap: "10px",
+          gap: "8px",
           WebkitAppRegion: "no-drag",
         } as React.CSSProperties}
         onMouseDown={(e) => e.stopPropagation()}
@@ -141,6 +143,7 @@ export const TitleBar: React.FC<TitleBarProps> = ({
         >
           <AppLogoIcon size={24} />
         </div>
+        <LogoBanner height={18} />
 
         {/* Admin Badge */}
         <Tooltip content={isAdmin ? `${t("admin_active_tooltip")} (${osInfo})` : t("admin_user_tooltip")}>

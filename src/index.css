@@ -97,7 +97,7 @@ body {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+  transition: background-color var(--transition-fast), color var(--transition-fast);
 }
 
 .icon-btn-containerless:hover {
@@ -107,7 +107,6 @@ body {
 
 .icon-btn-containerless:active {
   background-color: rgba(255, 255, 255, 0.14);
-  transform: scale(0.95);
 }
 
 .icon-btn-containerless.active {
@@ -184,19 +183,41 @@ body {
   background-color: rgba(255, 255, 255, 0.12);
 }
 
-/* Hero Central Optimization Button */
+/* Dashboard */
+.dashboard-view {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: clamp(16px, 3vw, 32px);
+}
+
+.dashboard-hero {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 22px;
+}
+
+/* Main optimization action */
 .hero-boost-button {
-  width: 190px;
-  height: 190px;
+  width: clamp(220px, 42vmin, 264px);
+  aspect-ratio: 1;
   border-radius: 50%;
   background: linear-gradient(135deg, var(--accent-color) 0%, #D84315 100%);
   border: 4px solid var(--surface-1);
   color: #FFFFFF;
+  font-family: var(--font-family);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px;
+  flex-shrink: 0;
   cursor: pointer;
   outline: none;
   box-shadow: 0 0 40px rgba(235, 93, 61, 0.3), inset 0 2px 10px rgba(255, 255, 255, 0.3);
@@ -224,6 +245,66 @@ body {
 
 .hero-boost-button.running {
   animation: boostPulse 1.8s infinite;
+}
+
+.hero-boost-icon {
+  display: block;
+  width: 56px;
+  height: 56px;
+  font-size: 56px;
+  line-height: 1;
+}
+
+.hero-boost-label {
+  font-size: 17px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+}
+
+.dashboard-progress {
+  display: flex;
+  width: min(320px, calc(100vw - 48px));
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+
+.dashboard-progress-track {
+  width: 100%;
+  height: 6px;
+  overflow: hidden;
+  border: 1px solid var(--outline-border);
+  border-radius: 3px;
+  background: var(--surface-2);
+}
+
+.dashboard-progress-label {
+  max-width: min(320px, calc(100vw - 48px));
+  overflow: hidden;
+  color: var(--text-secondary);
+  font-size: 11px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.dashboard-status {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+
+.dashboard-status-count {
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.dashboard-status-time {
+  color: var(--text-muted);
+  font-size: 11px;
 }
 
 @keyframes boostPulse {
@@ -257,10 +338,9 @@ body {
 /* Tooltip Styling inside Portal */
 #global-tooltip-portal {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 0;
-  height: 0;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 9999;
 }
@@ -274,19 +354,27 @@ body {
   border-radius: 8px;
   font-size: 12px;
   font-weight: 500;
-  white-space: nowrap;
+  line-height: 1.4;
+  max-width: calc(100vw - 24px);
+  max-height: calc(100vh - 24px);
+  overflow: auto;
+  overflow-wrap: anywhere;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
   pointer-events: none;
-  animation: tooltipFadeIn 0.15s ease-out forwards;
+  animation: tooltipFadeIn 0.12s ease-out both;
 }
 
 @keyframes tooltipFadeIn {
   from {
     opacity: 0;
-    transform: scale(0.92);
   }
   to {
     opacity: 1;
-    transform: scale(1);
+  }
+}
+
+@media (max-height: 600px) {
+  .hero-boost-button {
+    width: 240px;
   }
 }

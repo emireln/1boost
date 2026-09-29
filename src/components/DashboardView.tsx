@@ -1,6 +1,5 @@
 import React from "react";
 import { TweakProgressPayload } from "../types/tweak";
-import { LogoBanner } from "./LogoBanner";
 import { ParallaxStars } from "./ParallaxStars";
 import { useTranslation } from "../i18n/useTranslation";
 
@@ -26,82 +25,35 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   const { t } = useTranslation();
 
   return (
-    <div
-      style={{
-        flex: 1,
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        position: "relative",
-        padding: "24px",
-        overflow: "hidden",
-      }}
-    >
+    <main className="dashboard-view">
       {/* Optional Parallax Stars Background Layer */}
       {enableParallaxStars && <ParallaxStars />}
 
-      {/* Top Vector Banner */}
-      <div
-        style={{
-          position: "absolute",
-          top: "36px",
-          display: "flex",
-          justifyContent: "center",
-          width: "100%",
-          zIndex: 1,
-        }}
-      >
-        <LogoBanner height={88} />
-      </div>
-
-      {/* Hero Boost Button - Exactly Middle of Screen */}
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "24px",
-          zIndex: 2,
-        }}
-      >
+      <section className="dashboard-hero" aria-label={t("nav_boost")}>
         <button
           className={`hero-boost-button ${isRunning ? "running" : ""}`}
           onClick={onRunBoost}
           disabled={isRunning || selectedCount === 0}
+          aria-label={isRunning ? t("boosting") : t("boost_now")}
+          aria-busy={isRunning}
         >
-          <span
-            className="material-symbols-outlined"
-            style={{ fontSize: "56px", lineHeight: "1" }}
-          >
-            {isRunning ? "sync" : "bolt"}
-          </span>
-          <span style={{ fontSize: "16px", fontWeight: 800, letterSpacing: "1.2px", textTransform: "uppercase" }}>
+          {isRunning ? (
+            <span className="material-symbols-outlined hero-boost-icon" aria-hidden="true">
+              sync
+            </span>
+          ) : (
+            <svg className="hero-boost-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M13.2 2.5 5.7 13h5l-.8 8.5L18.3 10h-5.1z" fill="currentColor" />
+            </svg>
+          )}
+          <span className="hero-boost-label">
             {isRunning ? t("boosting") : t("boost_now")}
           </span>
         </button>
 
-        {/* Minimalist Progress Track (Only displayed during active boost) */}
         {isRunning && (
-          <div
-            style={{
-              width: "280px",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-            }}
-          >
-            <div
-              style={{
-                width: "100%",
-                height: "6px",
-                backgroundColor: "var(--surface-2)",
-                borderRadius: "3px",
-                overflow: "hidden",
-                border: "1px solid var(--outline-border)",
-              }}
-            >
+          <div className="dashboard-progress">
+            <div className="dashboard-progress-track">
               <div
                 style={{
                   height: "100%",
@@ -114,46 +66,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               />
             </div>
             {progress?.step_name && (
-              <span
-                style={{
-                  fontSize: "11px",
-                  color: "var(--text-secondary)",
-                  maxWidth: "280px",
-                  textAlign: "center",
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  whiteSpace: "nowrap",
-                }}
-              >
+              <span className="dashboard-progress-label">
                 {progress.step_name} ({percentage}%)
               </span>
             )}
           </div>
         )}
 
-        {/* Status Subtitle Below Button */}
         {!isRunning && (
-          <div
-            style={{
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "4px",
-            }}
-          >
-            <span style={{ fontSize: "13px", color: "var(--text-secondary)" }}>
+          <div className="dashboard-status">
+            <span className="dashboard-status-count">
               {selectedCount > 0
                 ? `${selectedCount} ${t("optimizations_queued")}`
                 : t("ready_to_optimize")}
             </span>
             {lastRunTime && (
-              <span style={{ fontSize: "11px", color: "var(--text-muted)" }}>
+              <span className="dashboard-status-time">
                 {t("system_optimized")}: {lastRunTime}
               </span>
             )}
           </div>
         )}
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
